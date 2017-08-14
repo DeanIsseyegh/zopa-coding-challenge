@@ -25,14 +25,14 @@ public class LenderPoolTest {
 	}
 
 	@Test
-	public void Calculates_Sum_Of_Lender_Rates() {
+	public void Calculates_Weighted_Sum_Of_LenderRates() {
 		Lender lender1 = mock(Lender.class);
 		Lender lender2 = mock(Lender.class);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
-		lenders.forEach(lender -> when(lender.getRate()).thenReturn(new BigDecimal("0.2")));
+		lenders.forEach(lender -> when(lender.getWeightedRate()).thenReturn(new BigDecimal("0.2")));
 		LenderPool lenderPool = new LenderPool(lenders);
 
-		assertThat(lenderPool.sumAllRates(), is(new BigDecimal("0.4")));
+		assertThat(lenderPool.sumAllWeightedRates(), is(new BigDecimal("0.4")));
 	}
 
 	@Test

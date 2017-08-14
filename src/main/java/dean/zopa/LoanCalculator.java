@@ -1,16 +1,32 @@
 package dean.zopa;
 
+import org.javamoney.moneta.Money;
+
+import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class LoanCalculator {
 
-	public Map<String,BigDecimal> invest(BigDecimal moneyToInvest, List<Lender> lenders) {
+	private LoanAlgorithm loanAlgorithm;
+	private List<Map<Lender, MonetaryAmount>> amountsToBorrowPerLenderList = new ArrayList<>();
 
-		return null;
+	public LoanCalculator(LenderPool lenderPool) {
+		loanAlgorithm  = new LoanAlgorithm(lenderPool);
+	}
+
+	public List<Map<Lender, MonetaryAmount>> quote(MonetaryAmount amountToBorrow) {
+		Map<Lender, BigDecimal> lenderRatios = loanAlgorithm.calcLenderRatios();
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = loanAlgorithm.calcAmountsToBorrowPerLender(amountToBorrow, lenderRatios);
+		MonetaryAmount leftOverAmount = loanAlgorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+		amountsToBorrowPerLenderList.add(amountsToBorrowPerLender);
+		System.out.println(leftOverAmount);
+		if (leftOverAmount.isGreaterThan(Money.of(0.001, Config.CURRENCY))) {
+			quote(leftOverAmount);
+		}
+		return amountsToBorrowPerLenderList;
 	}
 
 	/**

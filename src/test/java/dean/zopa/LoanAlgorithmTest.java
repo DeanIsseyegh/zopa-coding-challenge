@@ -1,7 +1,6 @@
 package dean.zopa;
 
 import org.javamoney.moneta.Money;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.money.MonetaryAmount;
@@ -11,90 +10,73 @@ import java.util.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class LoanAlgorithmTest {
 
 	@Test
-	public void Splits_Up_Borrowers_Amount_into_1s() {
-		MonetaryAmount amount = Money.of(3, "GBP");
-		LoanAlgorithm algorithm = new LoanAlgorithm(null);
-		MonetaryAmount expectedAmount = Money.of(1, Config.CURRENCY);
-		assertThat(algorithm.splitBorrowerAmount(amount), is(Arrays.asList(expectedAmount,expectedAmount,expectedAmount)));
-	}
-
-	@Test
 	public void Given_LenderPoolWithOneLender_Return_LenderRatioMap() {
-		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
-		Lender lender = new Lender("BobbyDropTables", new BigDecimal("0.1"), borrowerAmount);
+		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(1, Config.CURRENCY));
 		LenderPool lenderPool = new LenderPool(Collections.singletonList(lender));
-		Map<Lender, BigDecimal> expectedRatios = Collections.singletonMap(lender, new BigDecimal("1.000"));
+		Map<Lender, BigDecimal> expectedRatios = Collections.singletonMap(lender, new BigDecimal("1.000000"));
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
 
-		assertThat(algorithm.calcLenderRatios(borrowerAmount), is(expectedRatios));
+		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
 
 	@Test
 	public void Given_LenderPoolWithTwoLendersOfSameRates_Return_LenderRatioMap() {
-		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
-
-		Lender lender1 =  new Lender("Bob", new BigDecimal("0.2"), null);
-		Lender lender2 =  new Lender("Charlie", new BigDecimal("0.2"), null);
+		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), null);
+		Lender lender2 = new Lender("l2", new BigDecimal("0.2"), null);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
 
 		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
-		expectedRatios.put(lender1, new BigDecimal("0.500"));
-		expectedRatios.put(lender2, new BigDecimal("0.500"));
+		expectedRatios.put(lender1, new BigDecimal("0.500000"));
+		expectedRatios.put(lender2, new BigDecimal("0.500000"));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
 
-		assertThat(algorithm.calcLenderRatios(borrowerAmount), is(expectedRatios));
+		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
 
 	@Test
 	public void Given_LenderPoolWithTwoLendersWithDifferentRates_Return_WeightedLenderRatioMap() {
-		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
-
-		Lender lender1 = new Lender("Bob", new BigDecimal("0.2"), null);
-		Lender lender2 = new Lender("Charlie", new BigDecimal("0.4"), null);
+		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), null);
+		Lender lender2 = new Lender("l2", new BigDecimal("0.4"), null);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
 
 		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
-		expectedRatios.put(lender1, new BigDecimal("0.667"));
-		expectedRatios.put(lender2, new BigDecimal("0.333"));
+		expectedRatios.put(lender1, new BigDecimal("0.571429"));
+		expectedRatios.put(lender2, new BigDecimal("0.428571"));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
 
-		assertThat(algorithm.calcLenderRatios(borrowerAmount), is(expectedRatios));
+		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
 
 	@Test
 	public void Given_LenderPoolWithFourLendersWithDifferentRates_Return_WeightedLenderRatioMap() {
-		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
-
-		Lender lender1 = new Lender("a", new BigDecimal("0.05"), null);
-		Lender lender2 = new Lender("b", new BigDecimal("0.3"), null);
-		Lender lender3 = new Lender("c", new BigDecimal("0.02"), null);
-		Lender lender4 = new Lender("d", new BigDecimal("0.075"), null);
+		Lender lender1 = new Lender("l1", new BigDecimal("0.05"), null);
+		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), null);
+		Lender lender3 = new Lender("l3", new BigDecimal("0.02"), null);
+		Lender lender4 = new Lender("l4", new BigDecimal("0.075"), null);
 		List<Lender> lenders = Arrays.asList(lender1, lender2, lender3, lender4);
 
 		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
-		expectedRatios.put(lender1, new BigDecimal("0.169"));
-		expectedRatios.put(lender2, new BigDecimal("0.045"));
-		expectedRatios.put(lender3, new BigDecimal("0.674"));
-		expectedRatios.put(lender4, new BigDecimal("0.112"));
+		expectedRatios.put(lender1, new BigDecimal("0.267229"));
+		expectedRatios.put(lender2, new BigDecimal("0.196906"));
+		expectedRatios.put(lender3, new BigDecimal("0.275668"));
+		expectedRatios.put(lender4, new BigDecimal("0.260197"));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
 
-		assertThat(algorithm.calcLenderRatios(borrowerAmount), is(expectedRatios));
+		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
 
 	@Test
 	public void Given_LenderRatiosMapWithOneLender_Return_MapOfAmountToBeBorrowedFromTheLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender = new Lender(null, null, null);
+		Lender lender = new Lender("l1", null, null);
 		List<Lender> lenders = Collections.singletonList(lender);
 
 		Map<Lender, BigDecimal> lenderRatios = Collections.singletonMap(lender, new BigDecimal("1.000"));
@@ -109,8 +91,8 @@ public class LoanAlgorithmTest {
 	public void Given_TwoEqualLenderRatios_Return_MapOfAmountToBeBorrowedPerLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender1 = new Lender(null, null, null);
-		Lender lender2 = new Lender(null, null, null);
+		Lender lender1 = new Lender("l1", null, null);
+		Lender lender2 = new Lender("l2", null, null);
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
@@ -130,8 +112,8 @@ public class LoanAlgorithmTest {
 	public void Given_TwoDifferentLenderRatios_Return_MapOfAmountToBeBorrowedPerLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender1 = new Lender(null, null, null);
-		Lender lender2 = new Lender(null, null, null);
+		Lender lender1 = new Lender("l1", null, null);
+		Lender lender2 = new Lender("l2", null, null);
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
@@ -151,25 +133,114 @@ public class LoanAlgorithmTest {
 	public void Given_FourDifferentLenderRatios_Return_MapOfAmountToBeBorrowedPerLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender1 = new Lender(null, null, null);
-		Lender lender2 = new Lender(null, null, null);
-		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
+		Lender lender1 = new Lender("l1", null, null);
+		Lender lender2 = new Lender("l2", null, null);
+		Lender lender3 = new Lender("l3", null, null);
+		Lender lender4 = new Lender("l4", null, null);
+		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2, lender3, lender4));
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
 		lenderRatios.put(lender1, new BigDecimal("0.200"));
 		lenderRatios.put(lender2, new BigDecimal("0.400"));
-		lenderRatios.put(lender1, new BigDecimal("0.300"));
-		lenderRatios.put(lender2, new BigDecimal("0.100"));
+		lenderRatios.put(lender3, new BigDecimal("0.300"));
+		lenderRatios.put(lender4, new BigDecimal("0.100"));
 
 		Map<Lender, MonetaryAmount> expectedResult = new HashMap<>();
 		expectedResult.put(lender1, Money.of(2.00, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(4.00, Config.CURRENCY));
-		expectedResult.put(lender1, Money.of(3.00, Config.CURRENCY));
-		expectedResult.put(lender2, Money.of(1.00, Config.CURRENCY));
+		expectedResult.put(lender3, Money.of(3.00, Config.CURRENCY));
+		expectedResult.put(lender4, Money.of(1.00, Config.CURRENCY));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
 
 		assertThat(algorithm.calcAmountsToBorrowPerLender(borrowerAmount, lenderRatios), is(expectedResult));
+	}
+
+	@Test
+	public void Given_LendersAllHaveEnough_DoNotModify_AndReturnZeroLeftoverAmount() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(2.00, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.1"), Money.of(4.00, Config.CURRENCY));
+		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
+
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
+		amountsToBorrowPerLender.put(lender1, Money.of(2.00, Config.CURRENCY));
+		amountsToBorrowPerLender.put(lender2, Money.of(4.00, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		expectedResult.put(lender1, Money.of(2.00, Config.CURRENCY));
+		expectedResult.put(lender2, Money.of(4.00, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+
+		assertThat(amountsToBorrowPerLender, is(expectedResult));
+		assertThat(leftOverMoney, is(Money.of(0, Config.CURRENCY)));
+	}
+
+	@Test
+	public void Given_OneLender__Then_ModifyTheAmountToLend_AndReturnLeftOverAmount() {
+		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+		LenderPool lenderPool = new LenderPool(Collections.singletonList(lender));
+
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new TreeMap<>();
+		amountsToBorrowPerLender.put(lender, Money.of(20, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		expectedResult.put(lender, Money.of(10, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+
+		assertThat(amountsToBorrowPerLender, is(expectedResult));
+		assertThat(leftOverMoney, is(Money.of(10, Config.CURRENCY)));
+	}
+
+	@Test
+	public void Given_TwoLenders_AndOneDoesNotHaveEnoughToLend_Then_ModifyTheAmountToLend_AndReturnLeftOverAmount() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
+
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
+		amountsToBorrowPerLender.put(lender1, Money.of(10, Config.CURRENCY));
+		amountsToBorrowPerLender.put(lender2, Money.of(20, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		expectedResult.put(lender1, Money.of(10, Config.CURRENCY));
+		expectedResult.put(lender2, Money.of(10, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+
+		assertThat(amountsToBorrowPerLender, is(expectedResult));
+		assertThat(leftOverMoney, is(Money.of(10, Config.CURRENCY)));
+	}
+
+	@Test
+	public void Given_FourLenders_AndTwoDoNotHaveEnoughToLend_Then_ModifyTheAmountToLend_AndReturnLeftOverAmount() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.1"), Money.of(11, Config.CURRENCY));
+		Lender lender3 = new Lender("l3", new BigDecimal("0.1"), Money.of(12, Config.CURRENCY));
+		Lender lender4 = new Lender("l4", new BigDecimal("0.1"), Money.of(20, Config.CURRENCY));
+		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2, lender3, lender4));
+
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new TreeMap<>();
+		amountsToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
+		amountsToBorrowPerLender.put(lender2, Money.of(12, Config.CURRENCY));
+		amountsToBorrowPerLender.put(lender3, Money.of(16, Config.CURRENCY));
+		amountsToBorrowPerLender.put(lender4, Money.of(20, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		expectedResult.put(lender1, Money.of(8, Config.CURRENCY));
+		expectedResult.put(lender2, Money.of(11, Config.CURRENCY));
+		expectedResult.put(lender3, Money.of(12, Config.CURRENCY));
+		expectedResult.put(lender4, Money.of(20, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+
+		assertThat(leftOverMoney, is(Money.of(5, Config.CURRENCY)));
+		assertThat(amountsToBorrowPerLender, is(expectedResult));
 	}
 
 }

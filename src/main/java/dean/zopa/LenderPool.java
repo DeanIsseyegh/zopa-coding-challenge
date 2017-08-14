@@ -19,9 +19,9 @@ public class LenderPool {
 		return lenders;
 	}
 
-	public BigDecimal sumAllRates() {
+	public BigDecimal sumAllWeightedRates() {
 		return lenders.stream().
-				map(Lender::getRate).
+				map(Lender::getWeightedRate).
 				reduce(BigDecimal::add).
 				orElse(BigDecimal.ZERO);
 	}

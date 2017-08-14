@@ -9,40 +9,20 @@ import java.util.*;
 public class LoanAlgorithm {
 
 	private LenderPool lenderPool;
-	private int divisorScale = 3;
+	private int divisorScale = 6;
 
 	public LoanAlgorithm(LenderPool lenderPool) {
 		this.lenderPool = lenderPool;
 	}
 
-	public List<MonetaryAmount> splitBorrowerAmount(MonetaryAmount amount) {
-		List<MonetaryAmount> splitAmounts = new ArrayList<>();
-		for (long i = 0; i < amount.getNumber().longValue(); i++) {
-			splitAmounts.add(Money.of(1, Config.CURRENCY));
-		}
-		return splitAmounts;
-	}
-
-	public Map<Lender, BigDecimal> calcLenderRatios(MonetaryAmount borrowerAmount) {
-		BigDecimal summedRates = lenderPool.sumAllRates();
+	public Map<Lender, BigDecimal> calcLenderRatios() {
+		BigDecimal summedRates = lenderPool.sumAllWeightedRates();
 		Map<Lender, BigDecimal> ratioToBorrowPerLender = new TreeMap<>();
 		for (Lender lender : lenderPool.getLenders()) {
-			BigDecimal ratio = lender.getRate().divide(summedRates, divisorScale, BigDecimal.ROUND_HALF_UP);
+			BigDecimal ratio = lender.getWeightedRate().divide(summedRates, divisorScale, BigDecimal.ROUND_HALF_UP);
 			ratioToBorrowPerLender.put(lender, ratio);
 		}
-		return reverseLenderRatios(ratioToBorrowPerLender);
-	}
-
-	//TODO This was kinda hacked, re-do with tdd
-	private Map<Lender, BigDecimal> reverseLenderRatios(Map<Lender, BigDecimal> lenderRatios) {
-		ArrayList<BigDecimal> arrayList = new ArrayList<>(lenderRatios.values());
-		TreeMap<Lender, BigDecimal> reversedRatios = new TreeMap<>();
-		int i = 0;
-		for (Map.Entry<Lender, BigDecimal> entry : lenderRatios.entrySet()) {
-			reversedRatios.put(entry.getKey(), arrayList.get((lenderRatios.size() - 1) - i));
-			i++;
-		}
-		return reversedRatios;
+		return ratioToBorrowPerLender;
 	}
 
 	public Map<Lender, MonetaryAmount> calcAmountsToBorrowPerLender(MonetaryAmount borrowerAmount, Map<Lender, BigDecimal> lenderRatios) {
@@ -54,22 +34,22 @@ public class LoanAlgorithm {
 		return amountToBorrowPerLender;
 	}
 
-	public Map<Lender, MonetaryAmount> calcLenderRatioX(MonetaryAmount borrowerAmount) {
-		BigDecimal summedRates = lenderPool.sumAllRates();
-		HashMap<Lender, BigDecimal> ratioToBorrowPerLender = new HashMap<>();
-		for (Lender lender : lenderPool.getLenders()) {
-			BigDecimal ratio = lender.getRate().divide(summedRates, 3, BigDecimal.ROUND_HALF_UP);
-			System.out.println(ratio);
-			ratioToBorrowPerLender.put(lender, ratio);
+	public MonetaryAmount modifyAmountsToBorrowAndReturnLeftOverAmount(Map<Lender, MonetaryAmount> amountToBorrowPerLender) {
+		MonetaryAmount leftOverAmount = Money.of(0, Config.CURRENCY);
+
+		for (Lender lender : amountToBorrowPerLender.keySet()) {
+			MonetaryAmount amountToBorrow = amountToBorrowPerLender.get(lender);
+			MonetaryAmount maxAvail = lender.getAvailable();
+			if (amountToBorrow.isGreaterThan(maxAvail)) {
+				MonetaryAmount amountCantLend = amountToBorrow.subtract(maxAvail);
+				leftOverAmount = leftOverAmount.add(amountCantLend);
+				MonetaryAmount newAmountToBorrow = amountToBorrow.subtract(amountCantLend);
+				amountToBorrowPerLender.put(lender, newAmountToBorrow);
+				lender.sub(newAmountToBorrow); //TODO Unit Test - hacked this out - redo TDD
+			}
 		}
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new HashMap<>();
-		for (Lender lender : lenderPool.getLenders()) {
-			BigDecimal lenderRatio = BigDecimal.ONE.subtract(ratioToBorrowPerLender.get(lender));
-			MonetaryAmount amountToBorrowFromLender = borrowerAmount.multiply(lenderRatio);
-			System.out.println(amountToBorrowFromLender);
-			amountToBorrowPerLender.put(lender, amountToBorrowFromLender);
-		}
-		return amountToBorrowPerLender;
+
+		return leftOverAmount;
 	}
 
 }

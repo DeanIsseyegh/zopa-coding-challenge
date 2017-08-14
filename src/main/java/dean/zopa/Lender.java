@@ -27,12 +27,24 @@ public class Lender implements Comparable {
 		return rate;
 	}
 
+	public BigDecimal getWeightedRate() {
+		return BigDecimal.ONE.subtract(rate);
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	@Override
 	public int compareTo(Object o) {
-		return this.getRate().compareTo(((Lender) o).getRate());
+		Lender otherLender = (Lender) o;
+		return getWeightedRate().equals(otherLender.getWeightedRate()) ?
+				getName().compareTo(otherLender.getName()) :
+				getWeightedRate().compareTo(((Lender) o).getWeightedRate());
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 }
