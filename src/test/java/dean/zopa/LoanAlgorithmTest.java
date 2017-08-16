@@ -10,6 +10,7 @@ import java.util.*;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class LoanAlgorithmTest {
 
@@ -171,7 +172,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender2, Money.of(4.00, Config.CURRENCY));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
-		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
 		assertThat(leftOverMoney, is(Money.of(0, Config.CURRENCY)));
@@ -189,7 +190,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender, Money.of(10, Config.CURRENCY));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
-		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
 		assertThat(leftOverMoney, is(Money.of(10, Config.CURRENCY)));
@@ -210,7 +211,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender2, Money.of(10, Config.CURRENCY));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
-		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
 		assertThat(leftOverMoney, is(Money.of(10, Config.CURRENCY)));
@@ -237,10 +238,66 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender4, Money.of(20, Config.CURRENCY));
 
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
-		MonetaryAmount leftOverMoney = algorithm.modifyAmountsToBorrowAndReturnLeftOverAmount(amountsToBorrowPerLender);
+		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(leftOverMoney, is(Money.of(5, Config.CURRENCY)));
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
+	}
+
+	@Test
+	public void Given_TwoLenders_Then_SubtractTheirAvailableAmountsTheyAreLending() {
+		Lender lender1 = mock(Lender.class);
+		Lender lender2 = mock(Lender.class);
+		when(lender1.getAvailable()).thenReturn(Money.of(8, Config.CURRENCY));
+		when(lender2.getAvailable()).thenReturn(Money.of(4, Config.CURRENCY));
+		when(lender1.getName()).thenReturn("l1");
+		when(lender2.getName()).thenReturn("l2");
+		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
+
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
+		amountsToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
+		amountsToBorrowPerLender.put(lender2, Money.of(12, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
+
+		verify(lender1, times(1)).sub(Money.of(8, Config.CURRENCY));
+		verify(lender2, times(1)).sub(Money.of(4, Config.CURRENCY));
+	}
+
+	@Test
+	public void Merges_Maps_By_Adding_Money_From_Same_Lender() {
+		Lender lender = mock(Lender.class);
+		Map<Lender, MonetaryAmount> map1 = Collections.singletonMap(lender, Money.of(1, Config.CURRENCY));
+		Map<Lender, MonetaryAmount> map2 = Collections.singletonMap(lender, Money.of(2, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(mock(LenderPool.class));
+
+		Map<Lender, MonetaryAmount> expectedMergedMap = Collections.singletonMap(lender, Money.of(3, Config.CURRENCY));
+
+		assertThat(algorithm.mergeMaps(map1, map2), is(expectedMergedMap));
+	}
+
+	@Test
+	public void Merges_Maps_With_Multiple_Lenders() {
+		Lender lender1 = mock(Lender.class);
+		Lender lender2 = mock(Lender.class);
+
+		Map<Lender, MonetaryAmount> map1 = new HashMap<>();
+		map1.put(lender1, Money.of(5, Config.CURRENCY));
+		map1.put(lender2, Money.of(10, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> map2 = new HashMap<>();
+		map2.put(lender1, Money.of(20, Config.CURRENCY));
+		map2.put(lender2, Money.of(30, Config.CURRENCY));
+
+		LoanAlgorithm algorithm = new LoanAlgorithm(mock(LenderPool.class));
+
+		Map<Lender, MonetaryAmount> expectedMergedMap = new HashMap<>();
+		expectedMergedMap.put(lender1, Money.of(25, Config.CURRENCY));
+		expectedMergedMap.put(lender2, Money.of(40, Config.CURRENCY));
+
+		assertThat(algorithm.mergeMaps(map1, map2), is(expectedMergedMap));
 	}
 
 }

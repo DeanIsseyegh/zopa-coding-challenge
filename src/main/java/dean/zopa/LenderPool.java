@@ -5,7 +5,9 @@ import org.javamoney.moneta.function.MonetaryFunctions;
 
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LenderPool {
 
@@ -31,5 +33,11 @@ public class LenderPool {
 				map(Lender::getAvailable).
 				reduce(MonetaryFunctions.sum()).
 				orElse(Money.of(0, Config.CURRENCY));
+	}
+
+	public void removeLendersWithNoAvailFromPool() {
+		lenders = lenders.stream()
+				.filter(lender -> lender.getAvailable().isGreaterThan(Money.of(0, Config.CURRENCY)))
+				.collect(Collectors.toList());
 	}
 }

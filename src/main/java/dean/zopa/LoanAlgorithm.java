@@ -5,6 +5,8 @@ import org.javamoney.moneta.Money;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LoanAlgorithm {
 
@@ -34,22 +36,30 @@ public class LoanAlgorithm {
 		return amountToBorrowPerLender;
 	}
 
-	public MonetaryAmount modifyAmountsToBorrowAndReturnLeftOverAmount(Map<Lender, MonetaryAmount> amountToBorrowPerLender) {
+	//TODO See if can split this method up
+	public MonetaryAmount updateLenderAmountsAndReturnLeftOverAmount(Map<Lender, MonetaryAmount> amountToBorrowPerLender) {
 		MonetaryAmount leftOverAmount = Money.of(0, Config.CURRENCY);
-
 		for (Lender lender : amountToBorrowPerLender.keySet()) {
 			MonetaryAmount amountToBorrow = amountToBorrowPerLender.get(lender);
 			MonetaryAmount maxAvail = lender.getAvailable();
 			if (amountToBorrow.isGreaterThan(maxAvail)) {
 				MonetaryAmount amountCantLend = amountToBorrow.subtract(maxAvail);
 				leftOverAmount = leftOverAmount.add(amountCantLend);
-				MonetaryAmount newAmountToBorrow = amountToBorrow.subtract(amountCantLend);
-				amountToBorrowPerLender.put(lender, newAmountToBorrow);
-				lender.sub(newAmountToBorrow); //TODO Unit Test - hacked this out - redo TDD
+				amountToBorrow = amountToBorrow.subtract(amountCantLend);
+				amountToBorrowPerLender.put(lender, amountToBorrow);
 			}
+			lender.sub(amountToBorrow);
 		}
-
 		return leftOverAmount;
+	}
+
+	public Map<Lender, MonetaryAmount> mergeMaps(Map<Lender, MonetaryAmount> map1, Map<Lender, MonetaryAmount> map2) {
+		return Stream.concat(map1.entrySet().stream(), map2.entrySet().stream())
+				.collect(Collectors.toMap(
+						Map.Entry::getKey,
+						Map.Entry::getValue,
+						MonetaryAmount::add
+				));
 	}
 
 }

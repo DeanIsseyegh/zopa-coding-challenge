@@ -6,25 +6,11 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 public class Main {
 
 	public static void main(String... args) {
-		/*LoanCalculator loanCalculator = new LoanCalculator();
-		Lender lender = new Lender("Bob", new BigDecimal(7.1), new BigDecimal(100));
-		Lender lender2 = new Lender("Charlie", new BigDecimal(3.1), new BigDecimal(100));
-		Lender lender3 = new Lender("Roberto", new BigDecimal(2.5), new BigDecimal(100));
-		HashMap<String, Lender> lenders = new HashMap<>();
-		lenders.put(lender.name, lender);
-		lenders.put(lender2.name, lender2);
-		lenders.put(lender3.name, lender3);
-
-		Map<String, BigDecimal> output = loanCalculator.quote(new BigDecimal(1), lenders);
-
-		output.forEach((k,v) -> System.out.println(k + " : " + v))*/;
-
 		Lender lender1 = new Lender("Bob", new BigDecimal("0.075"), Money.of(640, Config.CURRENCY));
 		Lender lender2 = new Lender("Jane", new BigDecimal("0.069"), Money.of(480, Config.CURRENCY));
 		Lender lender3 = new Lender("Fred", new BigDecimal("0.071"), Money.of(520, Config.CURRENCY));
@@ -35,17 +21,15 @@ public class Main {
 
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2, lender3, lender4, lender5, lender6, lender7));
 
-		LoanCalculator loanCalculator = new LoanCalculator(lenderPool);
+		LoanCalculator loanCalculator = new LoanCalculator(new LoanAlgorithm(lenderPool));
 
-		List<Map<Lender, MonetaryAmount>> amountsToBorrowPerLenderList = loanCalculator.quote(Money.of(200, Config.CURRENCY));
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = loanCalculator.calcAmountToBorrowPerLender(Money.of(200, Config.CURRENCY));
 		MonetaryAmount totalAmount = Money.of(0, Config.CURRENCY);
 		ArrayList<BigDecimal> rates = new ArrayList<>();
-		for (Map<Lender, MonetaryAmount> lenderMonetaryAmountMap : amountsToBorrowPerLenderList) {
-			for (Map.Entry<Lender, MonetaryAmount> mapEntry: lenderMonetaryAmountMap.entrySet()) {
+			for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
 				totalAmount = totalAmount.add(mapEntry.getValue());
 				rates.add(mapEntry.getKey().getRate());
 			}
-		}
 
 		BigDecimal totalRate = rates.stream().reduce(BigDecimal::add).get();
 		BigDecimal averageWeight = totalRate.divide(new BigDecimal(rates.size()), 6, BigDecimal.ROUND_HALF_UP);
