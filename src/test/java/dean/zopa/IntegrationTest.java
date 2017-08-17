@@ -7,11 +7,8 @@ import dean.zopa.logic.LoanCalculator;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
 
-import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -29,20 +26,10 @@ public class IntegrationTest {
 		Lender lender7 = new Lender("Angela", new BigDecimal("0.071"), Money.of(60, Config.CURRENCY));
 
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2, lender3, lender4, lender5, lender6, lender7));
-
 		LoanCalculator loanCalculator = new LoanCalculator(new LoanAlgorithm(lenderPool));
+		Quote quote = new Quote(Money.of(1000, Config.CURRENCY), loanCalculator);
 
-		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = loanCalculator.calcAmountToBorrowPerLender(Money.of(200, Config.CURRENCY));
-		MonetaryAmount totalAmount = Money.of(0, Config.CURRENCY);
-		ArrayList<BigDecimal> rates = new ArrayList<>();
-		for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
-			totalAmount = totalAmount.add(mapEntry.getValue());
-			rates.add(mapEntry.getKey().getRate());
-		}
-
-		BigDecimal rate = loanCalculator.calcLoanRate(amountsToBorrowPerLender);
-
-		assertThat(totalAmount, is(Money.of(199.9998, Config.CURRENCY)));
-		assertThat(rate, is(new BigDecimal("0.0779")));
+		String expectedQuote = "Requested amount: £1,000.00\nRate: 8.0%\nMonthly repayment: £31.34\nTotal repayment: £1,128.12";
+		assertThat(quote.toString(), is(expectedQuote));
 	}
 }

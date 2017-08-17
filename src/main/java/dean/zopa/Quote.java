@@ -29,7 +29,8 @@ public class Quote {
 		totalRepaymentAmount = loanCalculator.calcTotalRepayment(monthlyPaymentAmount);
 	}
 
-	public String giveQuote() {
+	@Override
+	public String toString() {
 		return "Requested amount: " + format(amount) + "\n" +
 				"Rate: " + format(rate) + "%\n" +
 				"Monthly repayment: " + format(monthlyPaymentAmount) + "\n" +
@@ -37,7 +38,7 @@ public class Quote {
 	}
 
 	private String format(BigDecimal unformatted) {
-		return unformatted.multiply(new BigDecimal(100)).setScale(1).toString();
+		return unformatted.multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_HALF_EVEN).toString();
 	}
 
 	private String format(MonetaryAmount unformatted) {

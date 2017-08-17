@@ -38,7 +38,7 @@ public class LoanCalculator {
 			rates.add(mapEntry.getKey().getRate());
 		}
 		BigDecimal summedRates = rates.stream().reduce(BigDecimal::add).get();
-		return summedRates.divide(new BigDecimal(rates.size()), 4, BigDecimal.ROUND_HALF_UP);
+		return summedRates.divide(new BigDecimal(rates.size()), 2, BigDecimal.ROUND_HALF_UP);
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class LoanCalculator {
 	}
 
 	public MonetaryAmount calcTotalRepayment(MonetaryAmount monthlyRepayment) {
-		return monthlyRepayment.multiply(NUM_OF_MONTHS);
+		return monthlyRepayment.multiply(Config.REPAYMENT_PERIOD_IN_MONTHS);
 	}
 
 }

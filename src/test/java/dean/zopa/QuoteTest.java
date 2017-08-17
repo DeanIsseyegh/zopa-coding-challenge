@@ -37,7 +37,7 @@ public class QuoteTest {
 
 		Quote quote = new Quote(amount, loanCalculator);
 		String expectedOutput = "Requested amount: £1,000.00\nRate: 7.0%\nMonthly repayment: £30.78\nTotal repayment: £1,108.10";
-		assertThat(quote.giveQuote(), is(expectedOutput));
+		assertThat(quote.toString(), is(expectedOutput));
 	}
 
 }

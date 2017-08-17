@@ -77,7 +77,7 @@ public class LoanCalculatorTest {
 
 		LoanCalculator loanCalculator = new LoanCalculator(null);
 
-		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1")));
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.10")));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class LoanCalculatorTest {
 
 		LoanCalculator loanCalculator = new LoanCalculator(null);
 
-		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.3")));
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.30")));
 	}
 
 	@Test
@@ -108,8 +108,8 @@ public class LoanCalculatorTest {
 
 	@Test
 	public void Given_MonthlyRepaymentAmount_Then_ReturnTotalRepayment() {
-		MonetaryAmount monthlyAmount = Money.of(11, Config.CURRENCY);
+		MonetaryAmount monthlyAmount = Money.of(10, Config.CURRENCY);
 		LoanCalculator loanCalculator = new LoanCalculator(null);
-		assertThat(loanCalculator.calcTotalRepayment(monthlyAmount), is(Money.of(132, Config.CURRENCY)));
+		assertThat(loanCalculator.calcTotalRepayment(monthlyAmount), is(Money.of(360, Config.CURRENCY)));
 	}
 }
