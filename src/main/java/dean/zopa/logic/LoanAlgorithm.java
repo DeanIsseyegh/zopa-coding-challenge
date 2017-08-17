@@ -1,5 +1,8 @@
-package dean.zopa;
+package dean.zopa.logic;
 
+import dean.zopa.Config;
+import dean.zopa.Lender;
+import dean.zopa.LenderPool;
 import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
@@ -8,6 +11,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Algorithm has weak point that if a lender does not have a lot of money but offers a good rate, and the borrower
+ * requests a lot of money, all of the lenders money could end up for that one borrower.
+ *
+ * Alternative algorithm could be to not allow any lender to give more than 50% of their money to one borrower.
+ */
 public class LoanAlgorithm {
 
 	private LenderPool lenderPool;
@@ -17,7 +26,7 @@ public class LoanAlgorithm {
 		this.lenderPool = lenderPool;
 	}
 
-	public Map<Lender, BigDecimal> calcLenderRatios() {
+	Map<Lender, BigDecimal> calcLenderRatios() {
 		BigDecimal summedRates = lenderPool.sumAllWeightedRates();
 		Map<Lender, BigDecimal> ratioToBorrowPerLender = new TreeMap<>();
 		for (Lender lender : lenderPool.getLenders()) {
@@ -27,7 +36,7 @@ public class LoanAlgorithm {
 		return ratioToBorrowPerLender;
 	}
 
-	public Map<Lender, MonetaryAmount> calcAmountsToBorrowPerLender(MonetaryAmount borrowerAmount, Map<Lender, BigDecimal> lenderRatios) {
+	Map<Lender, MonetaryAmount> calcAmountsToBorrowPerLender(MonetaryAmount borrowerAmount, Map<Lender, BigDecimal> lenderRatios) {
 		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new HashMap<>();
 		for (Lender lender : lenderPool.getLenders()) {
 			MonetaryAmount amountToBorrowFromLender = borrowerAmount.multiply(lenderRatios.get(lender));
@@ -37,7 +46,7 @@ public class LoanAlgorithm {
 	}
 
 	//TODO See if can split this method up
-	public MonetaryAmount updateLenderAmountsAndReturnLeftOverAmount(Map<Lender, MonetaryAmount> amountToBorrowPerLender) {
+	MonetaryAmount updateLenderAmountsAndReturnLeftOverAmount(Map<Lender, MonetaryAmount> amountToBorrowPerLender) {
 		MonetaryAmount leftOverAmount = Money.of(0, Config.CURRENCY);
 		for (Lender lender : amountToBorrowPerLender.keySet()) {
 			MonetaryAmount amountToBorrow = amountToBorrowPerLender.get(lender);
@@ -53,7 +62,7 @@ public class LoanAlgorithm {
 		return leftOverAmount;
 	}
 
-	public Map<Lender, MonetaryAmount> mergeMaps(Map<Lender, MonetaryAmount> map1, Map<Lender, MonetaryAmount> map2) {
+	Map<Lender, MonetaryAmount> mergeMaps(Map<Lender, MonetaryAmount> map1, Map<Lender, MonetaryAmount> map2) {
 		return Stream.concat(map1.entrySet().stream(), map2.entrySet().stream())
 				.collect(Collectors.toMap(
 						Map.Entry::getKey,

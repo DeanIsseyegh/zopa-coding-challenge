@@ -3,6 +3,7 @@ package dean.zopa;
 import dean.zopa.logic.LoanAlgorithm;
 import dean.zopa.logic.LoanCalculator;
 import org.javamoney.moneta.Money;
+import org.junit.Test;
 
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
@@ -10,9 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-public class Main {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
-	public static void main(String... args) {
+public class IntegrationTest {
+
+	@Test
+	public void integrationTest() {
 		Lender lender1 = new Lender("Bob", new BigDecimal("0.075"), Money.of(640, Config.CURRENCY));
 		Lender lender2 = new Lender("Jane", new BigDecimal("0.069"), Money.of(480, Config.CURRENCY));
 		Lender lender3 = new Lender("Fred", new BigDecimal("0.071"), Money.of(520, Config.CURRENCY));
@@ -28,18 +33,14 @@ public class Main {
 		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = loanCalculator.calcAmountToBorrowPerLender(Money.of(200, Config.CURRENCY));
 		MonetaryAmount totalAmount = Money.of(0, Config.CURRENCY);
 		ArrayList<BigDecimal> rates = new ArrayList<>();
-			for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
-				totalAmount = totalAmount.add(mapEntry.getValue());
-				rates.add(mapEntry.getKey().getRate());
-			}
+		for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
+			totalAmount = totalAmount.add(mapEntry.getValue());
+			rates.add(mapEntry.getKey().getRate());
+		}
 
-		BigDecimal totalRate = rates.stream().reduce(BigDecimal::add).get();
-		BigDecimal averageWeight = totalRate.divide(new BigDecimal(rates.size()), 6, BigDecimal.ROUND_HALF_UP);
-		averageWeight = averageWeight.multiply(new BigDecimal("100")).setScale(2, BigDecimal.ROUND_HALF_UP);
-		System.out.println("Amount to lend: " + totalAmount);
-		System.out.println("Average weight: " + averageWeight);
+		BigDecimal rate = loanCalculator.calcLoanRate(amountsToBorrowPerLender);
 
+		assertThat(totalAmount, is(Money.of(199.9998, Config.CURRENCY)));
+		assertThat(rate, is(new BigDecimal("0.0779")));
 	}
-
-	//TODO: Deal with rounding issues/edge cases
 }

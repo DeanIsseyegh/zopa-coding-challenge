@@ -1,16 +1,18 @@
-package dean.zopa;
+package dean.zopa.logic;
 
+import dean.zopa.Config;
+import dean.zopa.Lender;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
 
 import javax.money.MonetaryAmount;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
-import static dean.zopa.LoanCalculator.MIN_LEFTOVER_AMOUNT_THRESHOLD;
+import static dean.zopa.logic.LoanCalculator.MIN_LEFTOVER_AMOUNT_THRESHOLD;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -66,4 +68,41 @@ public class LoanCalculatorTest {
 		verify(loanAlgorithm, times(4)).updateLenderAmountsAndReturnLeftOverAmount(amountToBorrowPerLender);
 	}
 
+	@Test
+	public void Given_OneLender_Then_ReturnLoanRate() {
+		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		amountToBorrowPerLender.put(lender, Money.of(8, Config.CURRENCY));
+
+		LoanCalculator loanCalculator = new LoanCalculator(null);
+
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1")));
+	}
+
+	@Test
+	public void Given_MultipleLenders_Then_ReturnAverageRate() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(10, Config.CURRENCY));
+		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(10, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		amountToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender2, Money.of(8, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender3, Money.of(8, Config.CURRENCY));
+
+		LoanCalculator loanCalculator = new LoanCalculator(null);
+
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.3")));
+	}
+
+	@Test
+	public void Given_Amount_And_Rate_And_PaymentPeriods_Then_ReturnMonthlyPayment() {
+		LoanCalculator loanCalculator = new LoanCalculator(null);
+		MonetaryAmount principalAmount = Money.of(1000, Config.CURRENCY);
+		BigDecimal rate = new BigDecimal("0.07");
+		MonetaryAmount monthlyRepayment = loanCalculator.calcMonthlyRepayment(principalAmount, rate, 36);
+		String expectedAmount = Config.CURRENCY + " 30.87";
+		assertTrue(monthlyRepayment.toString().startsWith(expectedAmount));
+	}
 }
