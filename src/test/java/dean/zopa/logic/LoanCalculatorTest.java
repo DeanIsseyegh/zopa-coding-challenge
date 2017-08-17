@@ -1,7 +1,7 @@
 package dean.zopa.logic;
 
 import dean.zopa.Config;
-import dean.zopa.Lender;
+import dean.zopa.lender.Lender;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
 
@@ -104,5 +104,12 @@ public class LoanCalculatorTest {
 		MonetaryAmount monthlyRepayment = loanCalculator.calcMonthlyRepayment(principalAmount, rate, 36);
 		String expectedAmount = Config.CURRENCY + " 30.87";
 		assertTrue(monthlyRepayment.toString().startsWith(expectedAmount));
+	}
+
+	@Test
+	public void Given_MonthlyRepaymentAmount_Then_ReturnTotalRepayment() {
+		MonetaryAmount monthlyAmount = Money.of(11, Config.CURRENCY);
+		LoanCalculator loanCalculator = new LoanCalculator(null);
+		assertThat(loanCalculator.calcTotalRepayment(monthlyAmount), is(Money.of(132, Config.CURRENCY)));
 	}
 }

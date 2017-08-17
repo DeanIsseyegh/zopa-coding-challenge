@@ -1,7 +1,7 @@
 package dean.zopa.logic;
 
 import dean.zopa.Config;
-import dean.zopa.Lender;
+import dean.zopa.lender.Lender;
 import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
@@ -15,6 +15,7 @@ public class LoanCalculator {
 	private LoanAlgorithm loanAlgorithm;
 	private Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
 	public final static MonetaryAmount MIN_LEFTOVER_AMOUNT_THRESHOLD = Money.of(0.001, Config.CURRENCY);
+	private final static BigDecimal NUM_OF_MONTHS = new BigDecimal("12");
 
 	public LoanCalculator(LoanAlgorithm loanAlgorithm) {
 		this.loanAlgorithm  = loanAlgorithm;
@@ -43,20 +44,16 @@ public class LoanCalculator {
 	/**
 	 * formula is c = (Pr / 1 - (1 / (1+r)^n))
 	 *
-	 * where c = monthly repayment
+	 * where:
+	 * c = monthly repayment
 	 * P = principal (amount)
 	 * r = monthly interest rate
 	 * n = number of payment periods
 	 *
 	 * This formula for the monthly payment on a U.S. mortgage is exact and is what banks use.
-	 * @param amount
-	 * @param rate
-	 * @param repaymentPeriod
-	 * @return
 	 */
 	public MonetaryAmount calcMonthlyRepayment(MonetaryAmount amount, BigDecimal rate, int repaymentPeriod) {
-		BigDecimal months = new BigDecimal("12");
-		BigDecimal monthlyInterest = rate.divide(months, 6, BigDecimal.ROUND_HALF_UP);
+		BigDecimal monthlyInterest = rate.divide(NUM_OF_MONTHS, 6, BigDecimal.ROUND_HALF_UP);
 		MonetaryAmount pr = amount.multiply(monthlyInterest);
 
 		BigDecimal onePlusR = BigDecimal.ONE.add(monthlyInterest);
@@ -64,6 +61,10 @@ public class LoanCalculator {
 		Double onePlusPowN = Math.pow(onePlusR.doubleValue(), (new BigDecimal(-repaymentPeriod)).doubleValue());
 
 		return pr.divide(BigDecimal.ONE.subtract(new BigDecimal(onePlusPowN)));
+	}
+
+	public MonetaryAmount calcTotalRepayment(MonetaryAmount monthlyRepayment) {
+		return monthlyRepayment.multiply(NUM_OF_MONTHS);
 	}
 
 }

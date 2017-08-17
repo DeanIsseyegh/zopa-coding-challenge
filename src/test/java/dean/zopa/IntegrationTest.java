@@ -1,5 +1,7 @@
 package dean.zopa;
 
+import dean.zopa.lender.Lender;
+import dean.zopa.lender.LenderPool;
 import dean.zopa.logic.LoanAlgorithm;
 import dean.zopa.logic.LoanCalculator;
 import org.javamoney.moneta.Money;

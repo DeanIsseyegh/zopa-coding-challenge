@@ -1,4 +1,4 @@
-package dean.zopa;
+package dean.zopa.lender;
 
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;

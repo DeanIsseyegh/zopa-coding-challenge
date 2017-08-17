@@ -1,11 +1,11 @@
-package dean.zopa;
+package dean.zopa.lender;
 
+import dean.zopa.Config;
 import org.javamoney.moneta.Money;
 import org.javamoney.moneta.function.MonetaryFunctions;
 
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

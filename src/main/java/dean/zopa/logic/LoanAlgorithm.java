@@ -1,8 +1,8 @@
 package dean.zopa.logic;
 
 import dean.zopa.Config;
-import dean.zopa.Lender;
-import dean.zopa.LenderPool;
+import dean.zopa.lender.Lender;
+import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
