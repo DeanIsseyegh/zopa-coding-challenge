@@ -15,7 +15,7 @@ public class LoanCalculator {
 	private LoanAlgorithm loanAlgorithm;
 	private Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
 	public final static MonetaryAmount MIN_LEFTOVER_AMOUNT_THRESHOLD = Money.of(0.001, Config.CURRENCY);
-	private final static BigDecimal NUM_OF_MONTHS = new BigDecimal("12");
+	public final static BigDecimal NUM_OF_MONTHS = new BigDecimal("12");
 
 	public LoanCalculator(LoanAlgorithm loanAlgorithm) {
 		this.loanAlgorithm  = loanAlgorithm;
