@@ -1,5 +1,10 @@
 package dean.zopa;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import dean.zopa.lender.Lender;
 import dean.zopa.lender.LenderPool;
 import dean.zopa.logic.LoanAlgorithm;
@@ -7,14 +12,18 @@ import dean.zopa.logic.LoanCalculator;
 import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class Main {
 
-	public static void main(String... args) {
+	public static void main(String... args) throws IOException {
 		Lender lender1 = new Lender("Bob", new BigDecimal("0.075"), Money.of(640, Config.CURRENCY));
 		Lender lender2 = new Lender("Jane", new BigDecimal("0.069"), Money.of(480, Config.CURRENCY));
 		Lender lender3 = new Lender("Fred", new BigDecimal("0.071"), Money.of(520, Config.CURRENCY));
@@ -40,6 +49,23 @@ public class Main {
 		averageWeight = averageWeight.multiply(new BigDecimal("100")).setScale(2, BigDecimal.ROUND_HALF_UP);
 		System.out.println("Amount to lend: " + totalAmount);
 		System.out.println("Average weight: " + averageWeight);
+
+
+
+		CsvMapper mapper = new CsvMapper();
+		CsvSchema schema = mapper.schemaFor(User.class);
+		schema = schema.withColumnSeparator('\t').withHeader();
+
+		String content = new String(Files.readAllBytes(Paths.get("market.csv")));
+		String csv = mapper.writer(schema).writeValueAsString(content);
+		MappingIterator<User> it = mapper.readerFor(User.class).with(schema).readValues(csv);
+		while (it.hasNextValue()) {
+			User value = it.nextValue();
+			System.out.println(value.getName());
+		}
+
+		File tempFile = new File("market.csv");
+
 
 	}
 
