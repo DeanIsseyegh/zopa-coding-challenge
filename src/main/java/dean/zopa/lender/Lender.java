@@ -45,6 +45,8 @@ public class Lender implements Comparable {
 
 	@Override
 	public String toString() {
-		return getName();
+		return "Name: " + getName() +
+				"| Rate: " + getRate() +
+				"| Available Amount: " + getAvailable();
 	}
 }
