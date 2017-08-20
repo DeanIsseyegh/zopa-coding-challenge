@@ -18,6 +18,17 @@ import java.util.stream.Stream;
 
 public class Main {
 
+
+	/**
+	 * TODO:
+	 * 1. Make sure no rounding issues
+	 * 2. Run against larger/more csv files
+	 * 3. Double check no input edge case validations have been missed (e.g. csv file)
+	 * 4. See if alogorithm can be simplified
+	 * @param args
+	 * @throws IOException
+	 */
+
 	//gradle run -PappArgs="['marketTest.csv', '1000']"
 	public static void main(String... args) throws IOException {
 		System.out.println(run(args[0], args[1]));
