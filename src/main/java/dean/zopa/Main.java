@@ -1,10 +1,5 @@
 package dean.zopa;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.MappingIterator;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import dean.zopa.lender.Lender;
 import dean.zopa.lender.LenderPool;
 import dean.zopa.logic.LoanAlgorithm;
@@ -51,18 +46,19 @@ public class Main {
 		System.out.println("Average weight: " + averageWeight);
 
 
+		String content = new String(Files.readAllBytes(Paths.get("market.csv")));
 
-		CsvMapper mapper = new CsvMapper();
+	/*	CsvMapper mapper = new CsvMapper();
 		CsvSchema schema = mapper.schemaFor(User.class);
 		schema = schema.withColumnSeparator('\t').withHeader();
 
-		String content = new String(Files.readAllBytes(Paths.get("market.csv")));
+		System.out.println(content);
 		String csv = mapper.writer(schema).writeValueAsString(content);
 		MappingIterator<User> it = mapper.readerFor(User.class).with(schema).readValues(csv);
 		while (it.hasNextValue()) {
 			User value = it.nextValue();
 			System.out.println(value.getName());
-		}
+		}*/
 
 		File tempFile = new File("market.csv");
 

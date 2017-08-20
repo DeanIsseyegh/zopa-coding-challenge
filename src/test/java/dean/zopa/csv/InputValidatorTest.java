@@ -5,11 +5,14 @@ import dean.zopa.lender.Lender;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
 
+import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
 public class InputValidatorTest {
+
+	private MonetaryAmount onePound = Money.of(1, Config.CURRENCY);
 
 	@Test(expected = IllegalArgumentException.class)
 	public void Given_EmptyContent_Then_ThrowException() {
@@ -96,9 +99,9 @@ public class InputValidatorTest {
 	public void Given_LendersWithNonUniqueNames_Then_ThrowExceptions() {
 		InputValidator inputValidator = new InputValidator();
 		List<Lender> lenders = Arrays.asList(
-				new Lender("l1", null, null),
-				new Lender("l1", null, null),
-				new Lender("l3", null, null));
+				new Lender("l1", null, onePound),
+				new Lender("l1", null, onePound),
+				new Lender("l3", null, onePound));
 
 		inputValidator.validateUniqueLenders(lenders);
 	}
@@ -107,9 +110,9 @@ public class InputValidatorTest {
 	public void Given_LendersWithUniqueNames_Then_DoNotThrowExceptions() {
 		InputValidator inputValidator = new InputValidator();
 		List<Lender> lenders = Arrays.asList(
-				new Lender("l1", null, null),
-				new Lender("l2", null, null),
-				new Lender("l3", null, null));
+				new Lender("l1", null, onePound),
+				new Lender("l2", null, onePound),
+				new Lender("l3", null, onePound));
 		inputValidator.validateUniqueLenders(lenders);
 	}
 

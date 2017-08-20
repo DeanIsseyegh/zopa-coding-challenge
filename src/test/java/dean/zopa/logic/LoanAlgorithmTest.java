@@ -17,9 +17,11 @@ import static org.mockito.Mockito.*;
 
 public class LoanAlgorithmTest {
 
+	private MonetaryAmount onePound = Money.of(1, Config.CURRENCY);
+
 	@Test
 	public void Given_LenderPoolWithOneLender_Return_LenderRatioMap() {
-		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(1, Config.CURRENCY));
+		Lender lender = new Lender("l1", new BigDecimal("0.1"), onePound);
 		LenderPool lenderPool = new LenderPool(Collections.singletonList(lender));
 		Map<Lender, BigDecimal> expectedRatios = Collections.singletonMap(lender, new BigDecimal("1.000000"));
 		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
@@ -29,8 +31,8 @@ public class LoanAlgorithmTest {
 
 	@Test
 	public void Given_LenderPoolWithTwoLendersOfSameRates_Return_LenderRatioMap() {
-		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), null);
-		Lender lender2 = new Lender("l2", new BigDecimal("0.2"), null);
+		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), onePound);
+		Lender lender2 = new Lender("l2", new BigDecimal("0.2"), onePound);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
 
 		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
@@ -44,8 +46,8 @@ public class LoanAlgorithmTest {
 
 	@Test
 	public void Given_LenderPoolWithTwoLendersWithDifferentRates_Return_WeightedLenderRatioMap() {
-		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), null);
-		Lender lender2 = new Lender("l2", new BigDecimal("0.4"), null);
+		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), onePound);
+		Lender lender2 = new Lender("l2", new BigDecimal("0.4"), onePound);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
 
 		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
@@ -59,10 +61,10 @@ public class LoanAlgorithmTest {
 
 	@Test
 	public void Given_LenderPoolWithFourLendersWithDifferentRates_Return_WeightedLenderRatioMap() {
-		Lender lender1 = new Lender("l1", new BigDecimal("0.05"), null);
-		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), null);
-		Lender lender3 = new Lender("l3", new BigDecimal("0.02"), null);
-		Lender lender4 = new Lender("l4", new BigDecimal("0.075"), null);
+		Lender lender1 = new Lender("l1", new BigDecimal("0.05"), onePound);
+		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), onePound);
+		Lender lender3 = new Lender("l3", new BigDecimal("0.02"), onePound);
+		Lender lender4 = new Lender("l4", new BigDecimal("0.075"), onePound);
 		List<Lender> lenders = Arrays.asList(lender1, lender2, lender3, lender4);
 
 		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
@@ -80,7 +82,7 @@ public class LoanAlgorithmTest {
 	public void Given_LenderRatiosMapWithOneLender_Return_MapOfAmountToBeBorrowedFromTheLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender = new Lender("l1", null, null);
+		Lender lender = new Lender("l1", null, onePound);
 		List<Lender> lenders = Collections.singletonList(lender);
 
 		Map<Lender, BigDecimal> lenderRatios = Collections.singletonMap(lender, new BigDecimal("1.000"));
@@ -95,8 +97,8 @@ public class LoanAlgorithmTest {
 	public void Given_TwoEqualLenderRatios_Return_MapOfAmountToBeBorrowedPerLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender1 = new Lender("l1", null, null);
-		Lender lender2 = new Lender("l2", null, null);
+		Lender lender1 = new Lender("l1", null, onePound);
+		Lender lender2 = new Lender("l2", null, onePound);
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
@@ -116,8 +118,8 @@ public class LoanAlgorithmTest {
 	public void Given_TwoDifferentLenderRatios_Return_MapOfAmountToBeBorrowedPerLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender1 = new Lender("l1", null, null);
-		Lender lender2 = new Lender("l2", null, null);
+		Lender lender1 = new Lender("l1", null, onePound);
+		Lender lender2 = new Lender("l2", null, onePound);
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2));
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
@@ -137,10 +139,10 @@ public class LoanAlgorithmTest {
 	public void Given_FourDifferentLenderRatios_Return_MapOfAmountToBeBorrowedPerLender() {
 		MonetaryAmount borrowerAmount = Money.of(10, Config.CURRENCY);
 
-		Lender lender1 = new Lender("l1", null, null);
-		Lender lender2 = new Lender("l2", null, null);
-		Lender lender3 = new Lender("l3", null, null);
-		Lender lender4 = new Lender("l4", null, null);
+		Lender lender1 = new Lender("l1", null, onePound);
+		Lender lender2 = new Lender("l2", null, onePound);
+		Lender lender3 = new Lender("l3", null, onePound);
+		Lender lender4 = new Lender("l4", null, onePound);
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2, lender3, lender4));
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
