@@ -6,6 +6,8 @@ import org.javamoney.moneta.Money;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 public class InputValidatorTest {
 
@@ -88,6 +90,27 @@ public class InputValidatorTest {
 		InputValidator inputValidator = new InputValidator();
 		Lender lender = new Lender("x", new BigDecimal("0.01"), Money.of(1, Config.CURRENCY));
 		inputValidator.validateLender(lender);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_LendersWithNonUniqueNames_Then_ThrowExceptions() {
+		InputValidator inputValidator = new InputValidator();
+		List<Lender> lenders = Arrays.asList(
+				new Lender("l1", null, null),
+				new Lender("l1", null, null),
+				new Lender("l3", null, null));
+
+		inputValidator.validateUniqueLenders(lenders);
+	}
+
+	@Test
+	public void Given_LendersWithUniqueNames_Then_DoNotThrowExceptions() {
+		InputValidator inputValidator = new InputValidator();
+		List<Lender> lenders = Arrays.asList(
+				new Lender("l1", null, null),
+				new Lender("l2", null, null),
+				new Lender("l3", null, null));
+		inputValidator.validateUniqueLenders(lenders);
 	}
 
 
