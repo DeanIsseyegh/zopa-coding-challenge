@@ -69,7 +69,7 @@ public class InputParserTest {
 
 	@Test
 	public void Given_AmountRequested_Then_ReturnParsedAmount() {
-		InputParser inputParser = new InputParser(new InputValidator());
+		InputParser inputParser = new InputParser(mock(InputValidator.class));
 		assertThat(inputParser.parseAmount("1000", null), is(new BigDecimal("1000")));
 	}
 
