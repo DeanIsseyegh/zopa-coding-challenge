@@ -2,6 +2,9 @@ group 'dean.zopa'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "dean.zopa.Main"
 
 sourceCompatibility = 1.8
 
@@ -13,4 +16,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
 	compile 'org.javamoney:moneta:1.1'
+}
+
+run {
+	if ( project.hasProperty("appArgs") ) {
+		args Eval.me(appArgs)
+	}
 }

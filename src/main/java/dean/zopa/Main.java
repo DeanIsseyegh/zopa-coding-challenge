@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 public class Main {
 
+	//gradle run -PappArgs="['marketTest.csv', '1000']"
 	public static void main(String... args) throws IOException {
 		System.out.println(run(args[0], args[1]));
 	}
