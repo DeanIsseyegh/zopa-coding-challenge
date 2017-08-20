@@ -2,6 +2,7 @@ package dean.zopa.csv;
 
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;
+import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
 
@@ -9,6 +10,9 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InputValidatorTest {
 
@@ -119,27 +123,37 @@ public class InputValidatorTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void Given_AmountNotDivisibleBy100_Then_ThrowException() {
 		InputValidator inputValidator = new InputValidator();
-		inputValidator.validateAmountRequested(new BigDecimal("99"));
+		inputValidator.validateAmountRequested(new BigDecimal("99"), null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void Given_AmountLessThan1000_Then_ThrowException() {
 		InputValidator inputValidator = new InputValidator();
-		inputValidator.validateAmountRequested(new BigDecimal("100"));
+		inputValidator.validateAmountRequested(new BigDecimal("100"), null);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void Given_AmountMoreThan15000_Then_ThrowException() {
 		InputValidator inputValidator = new InputValidator();
-		inputValidator.validateAmountRequested(new BigDecimal("15000.02"));
+		inputValidator.validateAmountRequested(new BigDecimal("15000.02"), null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_AmountMoreThanLenderPoolAvailableAmount_Then_ThrowException() {
+		InputValidator inputValidator = new InputValidator();
+		LenderPool lenderPool = mock(LenderPool.class);
+		when(lenderPool.sumAllAvailableAmounts()).thenReturn(Money.of(1000, Config.CURRENCY));
+		inputValidator.validateAmountRequested(new BigDecimal("2000"), lenderPool);
 	}
 
 	@Test
 	public void Given_ValidAmounts_Then_DoNotThrowException() {
 		InputValidator inputValidator = new InputValidator();
-		inputValidator.validateAmountRequested(new BigDecimal("1000"));
-		inputValidator.validateAmountRequested(new BigDecimal("15000"));
-		inputValidator.validateAmountRequested(new BigDecimal("3000"));
-		inputValidator.validateAmountRequested(new BigDecimal("1300"));
+		LenderPool lenderPool = mock(LenderPool.class);
+		when(lenderPool.sumAllAvailableAmounts()).thenReturn(Money.of(15000, Config.CURRENCY));
+		inputValidator.validateAmountRequested(new BigDecimal("1000"), lenderPool);
+		inputValidator.validateAmountRequested(new BigDecimal("15000"), lenderPool);
+		inputValidator.validateAmountRequested(new BigDecimal("3000"), lenderPool);
+		inputValidator.validateAmountRequested(new BigDecimal("1300"), lenderPool);
 	}
 }

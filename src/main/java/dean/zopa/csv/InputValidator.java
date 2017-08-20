@@ -2,6 +2,7 @@ package dean.zopa.csv;
 
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;
+import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 
 import java.math.BigDecimal;
@@ -31,13 +32,17 @@ public class InputValidator {
 		validateRate(lender);
 	}
 
-	public void validateAmountRequested(BigDecimal amount) {
+	public void validateAmountRequested(BigDecimal amount, LenderPool lenderPool) {
 		BigDecimal remainder = amount.remainder(new BigDecimal(100));
 		if (BigDecimal.ZERO.compareTo(remainder) != 0) {
 			throw new IllegalArgumentException("Amount requested of " + amount + " must be a 100 pound increment");
 		}
 		if (isLessThan(amount, new BigDecimal("1000")) || isMoreThanOrEqualTo(amount, new BigDecimal("15000.01"))) {
 			throw new IllegalArgumentException("Amount requested of " + amount + " must be more than or equal to 1000");
+		}
+		if (Money.of(amount, Config.CURRENCY).isGreaterThan(lenderPool.sumAllAvailableAmounts())) {
+			throw new IllegalArgumentException("Amount requested of " + amount +
+					" must be more than or equal to the lenders available amount of " + lenderPool.sumAllAvailableAmounts());
 		}
 	}
 

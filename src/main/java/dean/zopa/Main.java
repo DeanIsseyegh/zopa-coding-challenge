@@ -28,9 +28,9 @@ public class Main {
 		Stream<String> stream = Files.lines(Paths.get(filePath));
 		List<String> fileLines = stream.collect(Collectors.toList());
 		InputParser inputParser = new InputParser(new InputValidator());
-		BigDecimal amountRequested = inputParser.parseAmount(arg1);
 		List<Lender> lenders = inputParser.parseLenders(fileLines);
 		LenderPool lenderPool = new LenderPool(lenders);
+		BigDecimal amountRequested = inputParser.parseAmount(arg1, lenderPool);
 		LoanCalculator loanCalculator = new LoanCalculator(new LoanAlgorithm(lenderPool));
 		return new Quote(Money.of(amountRequested, Config.CURRENCY), loanCalculator);
 	}

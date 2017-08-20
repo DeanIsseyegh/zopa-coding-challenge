@@ -2,6 +2,7 @@ package dean.zopa.csv;
 
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;
+import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 
 import java.io.*;
@@ -36,9 +37,9 @@ public class InputParser {
 		return content.subList(1, content.size());
 	}
 
-	public BigDecimal parseAmount(String amount) {
+	public BigDecimal parseAmount(String amount, LenderPool lenderPool) {
 		BigDecimal parsedAmount = new BigDecimal(amount);
-		inputValidator.validateAmountRequested(parsedAmount);
+		inputValidator.validateAmountRequested(parsedAmount, lenderPool);
 		return  parsedAmount;
 	}
 

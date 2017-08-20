@@ -2,6 +2,7 @@ package dean.zopa.csv;
 
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;
+import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
 
@@ -68,16 +69,17 @@ public class InputParserTest {
 
 	@Test
 	public void Given_AmountRequested_Then_ReturnParsedAmount() {
-		InputParser inputParser = new InputParser(null);
-		assertThat(inputParser.parseAmount("1000"), is(new BigDecimal("1000")));
+		InputParser inputParser = new InputParser(new InputValidator());
+		assertThat(inputParser.parseAmount("1000", null), is(new BigDecimal("1000")));
 	}
 
 	@Test
 	public void Given_AmountRequested_Then_ValidateAmount() {
 		InputValidator inputValidator = mock(InputValidator.class);
 		InputParser inputParser = new InputParser(inputValidator);
-		inputParser.parseAmount("1000");
-		verify(inputValidator, times(1)).validateAmountRequested(new BigDecimal("1000"));
+		LenderPool lenderPool = new LenderPool(null);
+		inputParser.parseAmount("1000", lenderPool);
+		verify(inputValidator, times(1)).validateAmountRequested(new BigDecimal("1000"), lenderPool);
 	}
 
 }
