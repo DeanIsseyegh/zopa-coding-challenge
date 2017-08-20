@@ -11,17 +11,15 @@ import java.util.List;
 
 public class InputParser {
 
-	private List<String> content;
 	private InputValidator inputValidator;
 
-	public InputParser(List<String> content, InputValidator inputValidator) {
-		this.content = content;
+	public InputParser(InputValidator inputValidator) {
 		this.inputValidator = inputValidator;
 	}
 
-	public List<Lender> parseLenders() throws IOException {
+	public List<Lender> parseLenders(List<String> content) throws IOException {
 		List<Lender> lenders = new ArrayList<>();
-		removeFirstLine();
+		content = removeFirstLine(content);
 		for (String string : content) {
 			String[] spl = string.split(",");
 			Lender lender = new Lender(spl[0],
@@ -34,8 +32,14 @@ public class InputParser {
 		return lenders;
 	}
 
-	private void removeFirstLine() {
-		content = content.subList(1, content.size());
+	private List<String> removeFirstLine(List<String> content) {
+		return content.subList(1, content.size());
+	}
+
+	public BigDecimal parseAmount(String amount) {
+		BigDecimal parsedAmount = new BigDecimal(amount);
+		inputValidator.validateAmountRequested(parsedAmount);
+		return  parsedAmount;
 	}
 
 }

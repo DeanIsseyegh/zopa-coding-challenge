@@ -31,6 +31,16 @@ public class InputValidator {
 		validateRate(lender);
 	}
 
+	public void validateAmountRequested(BigDecimal amount) {
+		BigDecimal remainder = amount.remainder(new BigDecimal(100));
+		if (BigDecimal.ZERO.compareTo(remainder) != 0) {
+			throw new IllegalArgumentException("Amount requested of " + amount + " must be a 100 pound increment");
+		}
+		if (isLessThan(amount, new BigDecimal("1000")) || isMoreThanOrEqualTo(amount, new BigDecimal("15000.01"))) {
+			throw new IllegalArgumentException("Amount requested of " + amount + " must be more than or equal to 1000");
+		}
+	}
+
 	private void validateName(Lender lender) {
 		generalValidate(lender.getName());
 	}
@@ -42,17 +52,17 @@ public class InputValidator {
 	}
 
 	private void validateRate(Lender lender) {
-		if (isMoreThanOrEqualToOne(lender.getRate()) || isLessThanZero(lender.getRate())) {
+		if (isMoreThanOrEqualTo(lender.getRate(), BigDecimal.ONE) || isLessThan(lender.getRate(), BigDecimal.ZERO)) {
 			throw new IllegalArgumentException("Lender has a rate of 100% or more:\n" + lender);
 		}
 	}
 
-	private Boolean isMoreThanOrEqualToOne(BigDecimal number) {
-		return number.compareTo(BigDecimal.ONE) >= 0;
+	private Boolean isMoreThanOrEqualTo(BigDecimal x, BigDecimal y) {
+		return x.compareTo(y) >= 0;
 	}
 
-	private Boolean isLessThanZero(BigDecimal number) {
-		return number.compareTo(BigDecimal.ZERO) < 0;
+	private Boolean isLessThan(BigDecimal x, BigDecimal y) {
+		return x.compareTo(y) < 0;
 	}
 
 }

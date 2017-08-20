@@ -4,7 +4,6 @@ import dean.zopa.Config;
 import dean.zopa.lender.Lender;
 import org.javamoney.moneta.Money;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -16,6 +15,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class InputParserTest {
 
@@ -25,8 +25,8 @@ public class InputParserTest {
 		List<Lender> expectedLenders = Arrays.asList(
 				new Lender("Angela", new BigDecimal("0.071"), Money.of(60, Config.CURRENCY))
 		);
-		InputParser inputParser = new InputParser(content, new InputValidator());
-		assertThat(inputParser.parseLenders().toString(),
+		InputParser inputParser = new InputParser(new InputValidator());
+		assertThat(inputParser.parseLenders(content).toString(),
 				is(expectedLenders.toString()));
 	}
 
@@ -37,8 +37,8 @@ public class InputParserTest {
 				new Lender("Angela", new BigDecimal("0.071"), Money.of(60, Config.CURRENCY)),
 				new Lender("Jane", new BigDecimal("0.069"), Money.of(480, Config.CURRENCY))
 		);
-		InputParser inputParser = new InputParser(content, new InputValidator());
-		assertThat(inputParser.parseLenders().toString(),
+		InputParser inputParser = new InputParser(new InputValidator());
+		assertThat(inputParser.parseLenders(content).toString(),
 				is(expectedLenders.toString()));
 	}
 
@@ -46,24 +46,38 @@ public class InputParserTest {
 	public void Given_ContentOfOneLender_Then_ValidateLenders() throws IOException {
 		List<String> content = Arrays.asList("Lender,Rate,Available", "Angela,0.071,60");
 		InputValidator inputValidator = mock(InputValidator.class);
-		InputParser inputParser = new InputParser(content, inputValidator);
+		InputParser inputParser = new InputParser(inputValidator);
 
-		inputParser.parseLenders();
+		inputParser.parseLenders(content);
 
-		Mockito.verify(inputValidator, times(1)).validateLender(any(Lender.class));
-		Mockito.verify(inputValidator, times(1)).validateUniqueLenders(any(List.class));
+		verify(inputValidator, times(1)).validateLender(any(Lender.class));
+		verify(inputValidator, times(1)).validateUniqueLenders(any(List.class));
 	}
 
 	@Test
 	public void Given_ContentOfLenders_Then_ValidateLenders() throws IOException {
 		List<String> content = Arrays.asList("Lender,Rate,Available", "Angela,0.071,60", "Jane,0.069,480");
 		InputValidator inputValidator = mock(InputValidator.class);
-		InputParser inputParser = new InputParser(content, inputValidator);
+		InputParser inputParser = new InputParser(inputValidator);
 
-		inputParser.parseLenders();
+		inputParser.parseLenders(content);
 
-		Mockito.verify(inputValidator, times(2)).validateLender(any(Lender.class));
-		Mockito.verify(inputValidator, times(1)).validateUniqueLenders(any(List.class));
+		verify(inputValidator, times(2)).validateLender(any(Lender.class));
+		verify(inputValidator, times(1)).validateUniqueLenders(any(List.class));
+	}
+
+	@Test
+	public void Given_AmountRequested_Then_ReturnParsedAmount() {
+		InputParser inputParser = new InputParser(null);
+		assertThat(inputParser.parseAmount("1000"), is(new BigDecimal("1000")));
+	}
+
+	@Test
+	public void Given_AmountRequested_Then_ValidateAmount() {
+		InputValidator inputValidator = mock(InputValidator.class);
+		InputParser inputParser = new InputParser(inputValidator);
+		inputParser.parseAmount("1000");
+		verify(inputValidator, times(1)).validateAmountRequested(new BigDecimal("1000"));
 	}
 
 }

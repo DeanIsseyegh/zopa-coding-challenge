@@ -107,7 +107,7 @@ public class InputValidatorTest {
 	}
 
 	@Test
-	public void Given_LendersWithUniqueNames_Then_DoNotThrowExceptions() {
+	public void Given_LendersWithUniqueNames_Then_DoNotThrowException() {
 		InputValidator inputValidator = new InputValidator();
 		List<Lender> lenders = Arrays.asList(
 				new Lender("l1", null, onePound),
@@ -116,5 +116,30 @@ public class InputValidatorTest {
 		inputValidator.validateUniqueLenders(lenders);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_AmountNotDivisibleBy100_Then_ThrowException() {
+		InputValidator inputValidator = new InputValidator();
+		inputValidator.validateAmountRequested(new BigDecimal("99"));
+	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_AmountLessThan1000_Then_ThrowException() {
+		InputValidator inputValidator = new InputValidator();
+		inputValidator.validateAmountRequested(new BigDecimal("100"));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_AmountMoreThan15000_Then_ThrowException() {
+		InputValidator inputValidator = new InputValidator();
+		inputValidator.validateAmountRequested(new BigDecimal("15000.02"));
+	}
+
+	@Test
+	public void Given_ValidAmounts_Then_DoNotThrowException() {
+		InputValidator inputValidator = new InputValidator();
+		inputValidator.validateAmountRequested(new BigDecimal("1000"));
+		inputValidator.validateAmountRequested(new BigDecimal("15000"));
+		inputValidator.validateAmountRequested(new BigDecimal("3000"));
+		inputValidator.validateAmountRequested(new BigDecimal("1300"));
+	}
 }

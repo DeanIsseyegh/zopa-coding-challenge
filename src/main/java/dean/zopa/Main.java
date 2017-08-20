@@ -8,31 +8,30 @@ import dean.zopa.logic.LoanAlgorithm;
 import dean.zopa.logic.LoanCalculator;
 import org.javamoney.moneta.Money;
 
-import javax.money.MonetaryAmount;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
 
 	public static void main(String... args) throws IOException {
-		String filePath = args[0];
-		String amountRequested = args[1];
+		System.out.println(run(args[0], args[1]));
+	}
+
+	public static Quote run(String arg0, String arg1) throws IOException {
+		String filePath = arg0;
 		Stream<String> stream = Files.lines(Paths.get(filePath));
 		List<String> fileLines = stream.collect(Collectors.toList());
-		InputParser inputParser = new InputParser(fileLines, new InputValidator());
-		List<Lender> lenders = inputParser.parseLenders();
+		InputParser inputParser = new InputParser(new InputValidator());
+		BigDecimal amountRequested = inputParser.parseAmount(arg1);
+		List<Lender> lenders = inputParser.parseLenders(fileLines);
 		LenderPool lenderPool = new LenderPool(lenders);
 		LoanCalculator loanCalculator = new LoanCalculator(new LoanAlgorithm(lenderPool));
-		Quote quote = new Quote(Money.of(new BigDecimal(amountRequested), Config.CURRENCY), loanCalculator);
-		System.out.println(quote.toString());
+		return new Quote(Money.of(amountRequested, Config.CURRENCY), loanCalculator);
 	}
 
 }
