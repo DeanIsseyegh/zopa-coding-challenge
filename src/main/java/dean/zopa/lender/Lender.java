@@ -3,7 +3,7 @@ package dean.zopa.lender;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 
-public class Lender implements Comparable {
+public class Lender {
 
 	private String name;
 	private BigDecimal rate;
@@ -33,14 +33,6 @@ public class Lender implements Comparable {
 
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public int compareTo(Object o) {
-		Lender otherLender = (Lender) o;
-		return getWeightedRate().equals(otherLender.getWeightedRate()) ?
-				getName().compareTo(otherLender.getName()) :
-				getWeightedRate().compareTo(((Lender) o).getWeightedRate());
 	}
 
 	@Override

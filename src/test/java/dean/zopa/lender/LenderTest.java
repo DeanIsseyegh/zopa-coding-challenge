@@ -48,22 +48,4 @@ public class LenderTest {
 		assertThat(lender.getAvailable(), is(Money.of(90, "GBP")));
 	}
 
-	@Test
-	public void Given_LendersWithDifferentRates_CompareBasedOnRates() {
-		Lender lender1 = new Lender("l1", new BigDecimal("0.2"), onePound);
-		Lender lender2 = new Lender("l2", new BigDecimal("0.4"), onePound);
-		lender1.compareTo(lender2);
-		assertThat(lender1.compareTo(lender2), is(1));
-		assertThat(lender2.compareTo(lender1), is(-1));
-	}
-
-	@Test
-	public void Given_LendersWithSameRates_CompareBasedOnName() {
-		Lender lender1 = new Lender("a", new BigDecimal("0.2"), onePound);
-		Lender lender2 = new Lender("b", new BigDecimal("0.2"), onePound);
-		lender1.compareTo(lender2);
-		assertThat(lender1.compareTo(lender2), is(-1));
-		assertThat(lender2.compareTo(lender1), is(1));
-	}
-
 }

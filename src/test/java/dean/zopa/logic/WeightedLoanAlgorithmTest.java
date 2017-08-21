@@ -35,7 +35,7 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender2 = new Lender("l2", new BigDecimal("0.2"), onePound);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
 
-		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
+		Map<Lender, BigDecimal> expectedRatios = new HashMap<>();
 		expectedRatios.put(lender1, new BigDecimal("0.500000"));
 		expectedRatios.put(lender2, new BigDecimal("0.500000"));
 
@@ -50,7 +50,7 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender2 = new Lender("l2", new BigDecimal("0.4"), onePound);
 		List<Lender> lenders = Arrays.asList(lender1, lender2);
 
-		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
+		Map<Lender, BigDecimal> expectedRatios = new HashMap<>();
 		expectedRatios.put(lender1, new BigDecimal("0.571429"));
 		expectedRatios.put(lender2, new BigDecimal("0.428571"));
 
@@ -67,7 +67,7 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender4 = new Lender("l4", new BigDecimal("0.075"), onePound);
 		List<Lender> lenders = Arrays.asList(lender1, lender2, lender3, lender4);
 
-		Map<Lender, BigDecimal> expectedRatios = new TreeMap<>();
+		Map<Lender, BigDecimal> expectedRatios = new HashMap<>();
 		expectedRatios.put(lender1, new BigDecimal("0.267229"));
 		expectedRatios.put(lender2, new BigDecimal("0.196906"));
 		expectedRatios.put(lender3, new BigDecimal("0.275668"));
@@ -172,7 +172,7 @@ public class WeightedLoanAlgorithmTest {
 		amountsToBorrowPerLender.put(lender1, Money.of(2.00, Config.CURRENCY));
 		amountsToBorrowPerLender.put(lender2, Money.of(4.00, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		Map<Lender, MonetaryAmount> expectedResult = new HashMap<>();
 		expectedResult.put(lender1, Money.of(2.00, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(4.00, Config.CURRENCY));
 
@@ -188,10 +188,10 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
 		LenderPool lenderPool = new LenderPool(Collections.singletonList(lender));
 
-		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new TreeMap<>();
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
 		amountsToBorrowPerLender.put(lender, Money.of(20, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		Map<Lender, MonetaryAmount> expectedResult = new HashMap<>();
 		expectedResult.put(lender, Money.of(10, Config.CURRENCY));
 
 		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
@@ -211,7 +211,7 @@ public class WeightedLoanAlgorithmTest {
 		amountsToBorrowPerLender.put(lender1, Money.of(10, Config.CURRENCY));
 		amountsToBorrowPerLender.put(lender2, Money.of(20, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		Map<Lender, MonetaryAmount> expectedResult = new HashMap<>();
 		expectedResult.put(lender1, Money.of(10, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(10, Config.CURRENCY));
 
@@ -230,13 +230,13 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender4 = new Lender("l4", new BigDecimal("0.1"), Money.of(20, Config.CURRENCY));
 		LenderPool lenderPool = new LenderPool(Arrays.asList(lender1, lender2, lender3, lender4));
 
-		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new TreeMap<>();
+		Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
 		amountsToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
 		amountsToBorrowPerLender.put(lender2, Money.of(12, Config.CURRENCY));
 		amountsToBorrowPerLender.put(lender3, Money.of(16, Config.CURRENCY));
 		amountsToBorrowPerLender.put(lender4, Money.of(20, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
+		Map<Lender, MonetaryAmount> expectedResult = new HashMap<>();
 		expectedResult.put(lender1, Money.of(8, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(11, Config.CURRENCY));
 		expectedResult.put(lender3, Money.of(12, Config.CURRENCY));
@@ -287,7 +287,7 @@ public class WeightedLoanAlgorithmTest {
 	public void Given_OneLender_Then_ReturnLoanRate() {
 		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new HashMap<>();
 		amountToBorrowPerLender.put(lender, Money.of(8, Config.CURRENCY));
 
 		WeightedLoanAlgorithm loanAlgorithm = new WeightedLoanAlgorithm(null);
@@ -301,7 +301,7 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(10, Config.CURRENCY));
 		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(10, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new HashMap<>();
 		amountToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
 		amountToBorrowPerLender.put(lender2, Money.of(8, Config.CURRENCY));
 		amountToBorrowPerLender.put(lender3, Money.of(8, Config.CURRENCY));
@@ -317,7 +317,7 @@ public class WeightedLoanAlgorithmTest {
 		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(20, Config.CURRENCY));
 		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(20, Config.CURRENCY));
 
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new HashMap<>();
 		amountToBorrowPerLender.put(lender1, Money.of(20, Config.CURRENCY));
 		amountToBorrowPerLender.put(lender2, Money.of(10, Config.CURRENCY));
 		amountToBorrowPerLender.put(lender3, Money.of(5, Config.CURRENCY));

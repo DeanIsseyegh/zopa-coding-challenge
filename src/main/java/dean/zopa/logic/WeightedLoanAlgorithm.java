@@ -12,12 +12,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Algorithm has weak point that if a lender does not have a lot of money but offers a good rate, and the borrower
- * requests a lot of money, all of the lenders money could end up for that one borrower.
- *
- * Alternative algorithm could be to not allow any lender to give more than 50% of their money to one borrower.
- */
 public class WeightedLoanAlgorithm {
 
 	private LenderPool lenderPool;
@@ -30,7 +24,7 @@ public class WeightedLoanAlgorithm {
 
 	Map<Lender, BigDecimal> calcLenderRatios() {
 		BigDecimal summedRates = lenderPool.sumAllWeightedRates();
-		Map<Lender, BigDecimal> ratioToBorrowPerLender = new TreeMap<>();
+		Map<Lender, BigDecimal> ratioToBorrowPerLender = new HashMap<>();
 		for (Lender lender : lenderPool.getLenders()) {
 			BigDecimal ratio = lender.getWeightedRate().divide(summedRates, divisorScale, BigDecimal.ROUND_HALF_UP);
 			ratioToBorrowPerLender.put(lender, ratio);

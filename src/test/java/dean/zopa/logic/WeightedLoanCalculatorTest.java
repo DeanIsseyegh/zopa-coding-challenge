@@ -10,7 +10,6 @@ import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static dean.zopa.logic.WeightedLoanCalculator.MIN_LEFTOVER_AMOUNT_THRESHOLD;
 import static org.hamcrest.core.Is.is;
@@ -70,7 +69,7 @@ public class WeightedLoanCalculatorTest {
 
 	@Test
 	public void Given_Lenders_Then_ReturnLoanRate() {
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new HashMap<>();
 
 		WeightedLoanAlgorithm loanAlgorithm = mock(WeightedLoanAlgorithm.class);
 		WeightedLoanCalculator loanCalculator = new WeightedLoanCalculator(loanAlgorithm);
