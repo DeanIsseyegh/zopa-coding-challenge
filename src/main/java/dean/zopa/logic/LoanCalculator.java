@@ -36,31 +36,12 @@ public class LoanCalculator {
 		return amountsToBorrowPerLender;
 	}
 
-	//Move logic into algorithm class
 	public BigDecimal calcLoanRate(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
 		return loanAlgorithm.calcLoanRate(amountsToBorrowPerLender);
 	}
 
-	/**
-	 * formula is c = (Pr / 1 - (1 / (1+r)^n))
-	 *
-	 * where:
-	 * c = monthly repayment
-	 * P = principal (amount)
-	 * r = monthly interest rate
-	 * n = number of payment periods
-	 *
-	 * This formula for the monthly payment on a U.S. mortgage is exact and is what banks use.
-	 */
 	public MonetaryAmount calcMonthlyRepayment(MonetaryAmount amount, BigDecimal rate, int repaymentPeriod) {
-		BigDecimal monthlyInterest = rate.divide(NUM_OF_MONTHS, 6, BigDecimal.ROUND_HALF_UP);
-		MonetaryAmount pr = amount.multiply(monthlyInterest);
-
-		BigDecimal onePlusR = BigDecimal.ONE.add(monthlyInterest);
-
-		Double onePlusPowN = Math.pow(onePlusR.doubleValue(), (new BigDecimal(-repaymentPeriod)).doubleValue());
-
-		return pr.divide(BigDecimal.ONE.subtract(new BigDecimal(onePlusPowN)));
+		return loanAlgorithm.calcMonthlyRepayment(amount, rate, repaymentPeriod);
 	}
 
 	public MonetaryAmount calcTotalRepayment(MonetaryAmount monthlyRepayment) {

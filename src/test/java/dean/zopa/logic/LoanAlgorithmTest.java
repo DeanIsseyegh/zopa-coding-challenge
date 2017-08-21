@@ -328,6 +328,16 @@ public class LoanAlgorithmTest {
 	}
 
 	@Test
+	public void Given_AmountAndRateAndPaymentPeriods_Then_ReturnMonthlyPayment() {
+		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+		MonetaryAmount principalAmount = Money.of(1000, Config.CURRENCY);
+		BigDecimal rate = new BigDecimal("0.07");
+		MonetaryAmount monthlyRepayment = loanAlgorithm.calcMonthlyRepayment(principalAmount, rate, 36);
+		String expectedAmount = Config.CURRENCY + " 30.87";
+		assertTrue(monthlyRepayment.toString().startsWith(expectedAmount));
+	}
+
+	@Test
 	public void Merges_Maps_With_Multiple_Lenders() {
 		Lender lender1 = mock(Lender.class);
 		Lender lender2 = mock(Lender.class);

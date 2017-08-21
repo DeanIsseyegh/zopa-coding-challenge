@@ -5,6 +5,7 @@ import dean.zopa.lender.Lender;
 import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 
+import javax.money.MonetaryAmount;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -37,9 +38,10 @@ public class InputParser {
 		return content.subList(1, content.size());
 	}
 
-	public BigDecimal parseAmount(String amount, LenderPool lenderPool) {
-		BigDecimal parsedAmount = new BigDecimal(amount);
-		inputValidator.validateAmountRequested(parsedAmount, lenderPool);
+	public MonetaryAmount parseAmount(String amount, LenderPool lenderPool) {
+		BigDecimal convertedAmount = new BigDecimal(amount);
+		inputValidator.validateAmountRequested(convertedAmount, lenderPool);
+		MonetaryAmount parsedAmount = Money.of(convertedAmount, Config.CURRENCY);
 		return  parsedAmount;
 	}
 

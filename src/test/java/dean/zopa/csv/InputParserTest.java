@@ -70,7 +70,7 @@ public class InputParserTest {
 	@Test
 	public void Given_AmountRequested_Then_ReturnParsedAmount() {
 		InputParser inputParser = new InputParser(mock(InputValidator.class));
-		assertThat(inputParser.parseAmount("1000", null), is(new BigDecimal("1000")));
+		assertThat(inputParser.parseAmount("1000", null), is(Money.of(1000, Config.CURRENCY)));
 	}
 
 	@Test

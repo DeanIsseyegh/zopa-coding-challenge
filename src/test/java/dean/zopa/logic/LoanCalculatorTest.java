@@ -80,13 +80,18 @@ public class LoanCalculatorTest {
 	}
 
 	@Test
-	public void Given_Amount_And_Rate_And_PaymentPeriods_Then_ReturnMonthlyPayment() {
-		LoanCalculator loanCalculator = new LoanCalculator(null);
-		MonetaryAmount principalAmount = Money.of(1000, Config.CURRENCY);
-		BigDecimal rate = new BigDecimal("0.07");
+	public void Given_AmountAndRateAndPaymentPeriods_Then_ReturnMonthlyPayment() {
+		LoanAlgorithm loanAlgorithm = mock(LoanAlgorithm.class);
+		LoanCalculator loanCalculator = new LoanCalculator(loanAlgorithm);
+
+		MonetaryAmount principalAmount = Money.of(1, Config.CURRENCY);
+		BigDecimal rate = BigDecimal.ONE;
+
+		MonetaryAmount expectedAmount = Money.of(1, Config.CURRENCY);
+		when(loanAlgorithm.calcMonthlyRepayment(principalAmount, rate, 36)).thenReturn(expectedAmount);
+
 		MonetaryAmount monthlyRepayment = loanCalculator.calcMonthlyRepayment(principalAmount, rate, 36);
-		String expectedAmount = Config.CURRENCY + " 30.87";
-		assertTrue(monthlyRepayment.toString().startsWith(expectedAmount));
+		assertThat(monthlyRepayment, is(expectedAmount));
 	}
 
 	@Test

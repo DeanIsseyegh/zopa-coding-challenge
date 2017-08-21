@@ -22,6 +22,7 @@ public class LoanAlgorithm {
 
 	private LenderPool lenderPool;
 	private int divisorScale = 6;
+	public final BigDecimal numOfMonths = new BigDecimal("12");
 
 	public LoanAlgorithm(LenderPool lenderPool) {
 		this.lenderPool = lenderPool;
@@ -46,7 +47,6 @@ public class LoanAlgorithm {
 		return amountToBorrowPerLender;
 	}
 
-	//TODO See if can split this method up
 	MonetaryAmount updateLenderAmountsAndReturnLeftOverAmount(Map<Lender, MonetaryAmount> amountToBorrowPerLender) {
 		MonetaryAmount leftOverAmount = Money.of(0, Config.CURRENCY);
 		for (Lender lender : amountToBorrowPerLender.keySet()) {
@@ -63,12 +63,9 @@ public class LoanAlgorithm {
 		return leftOverAmount;
 	}
 
-	//Move logic into algorithm class
 	public BigDecimal calcLoanRate(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
 		List<BigDecimal> rates = new ArrayList<>();
-		MonetaryAmount total = amountsToBorrowPerLender.entrySet().stream().
-				map(it -> it.getValue()).
-				reduce(MonetaryFunctions.sum()).get();
+		MonetaryAmount total = calcTotalAmountToBorrow(amountsToBorrowPerLender);
 		for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
 			MonetaryAmount divided = mapEntry.getValue().divide(total.getNumber());
 			BigDecimal dividedAsBigDec = new BigDecimal(divided.getNumber().toString());
@@ -76,6 +73,31 @@ public class LoanAlgorithm {
 			rates.add(weightedRate);
 		}
 		return rates.stream().reduce(BigDecimal::add).get().setScale(4, BigDecimal.ROUND_HALF_EVEN);
+	}
+
+	private MonetaryAmount calcTotalAmountToBorrow(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
+		return amountsToBorrowPerLender.entrySet().stream().
+				map(it -> it.getValue()).
+				reduce(MonetaryFunctions.sum()).get();
+	}
+
+	/**
+	 * formula is c = (Pr / 1 - (1 / (1+r)^n))
+	 *
+	 * where:
+	 * c = monthly repayment
+	 * P = principal (amount)
+	 * r = monthly interest rate
+	 * n = number of payment periods
+	 *
+	 * This formula for the monthly payment on a U.S. mortgage is exact and is what banks use.
+	 */
+	public MonetaryAmount calcMonthlyRepayment(MonetaryAmount amount, BigDecimal rate, int repaymentPeriod) {
+		BigDecimal monthlyInterest = rate.divide(numOfMonths, 6, BigDecimal.ROUND_HALF_UP);
+		MonetaryAmount pr = amount.multiply(monthlyInterest);
+		BigDecimal onePlusR = BigDecimal.ONE.add(monthlyInterest);
+		Double onePlusPowN = Math.pow(onePlusR.doubleValue(), (new BigDecimal(-repaymentPeriod)).doubleValue());
+		return pr.divide(BigDecimal.ONE.subtract(new BigDecimal(onePlusPowN)));
 	}
 
 	Map<Lender, MonetaryAmount> mergeMaps(Map<Lender, MonetaryAmount> map1, Map<Lender, MonetaryAmount> map2) {

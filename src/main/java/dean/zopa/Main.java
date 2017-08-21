@@ -10,6 +10,7 @@ import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.money.MonetaryAmount;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -46,11 +47,11 @@ public class Main {
 		InputParser inputParser = new InputParser(new InputValidator());
 		List<Lender> lenders = inputParser.parseLenders(fileLines);
 		LenderPool lenderPool = new LenderPool(lenders);
-		BigDecimal amountRequested = inputParser.parseAmount(arg1, lenderPool);
+		MonetaryAmount amountRequested = inputParser.parseAmount(arg1, lenderPool);
 
 		LoanCalculator loanCalculator = new LoanCalculator(new LoanAlgorithm(lenderPool));
 
-		return new Quote(Money.of(amountRequested, Config.CURRENCY), loanCalculator);
+		return new Quote(amountRequested, loanCalculator);
 	}
 
 }
