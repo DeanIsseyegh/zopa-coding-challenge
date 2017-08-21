@@ -284,6 +284,50 @@ public class LoanAlgorithmTest {
 	}
 
 	@Test
+	public void Given_OneLender_Then_ReturnLoanRate() {
+		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		amountToBorrowPerLender.put(lender, Money.of(8, Config.CURRENCY));
+
+		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+
+		assertThat(loanAlgorithm.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1000")));
+	}
+
+	@Test
+	public void Given_MultipleLenders_Then_ReturnAverageRate() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(10, Config.CURRENCY));
+		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(10, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		amountToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender2, Money.of(8, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender3, Money.of(8, Config.CURRENCY));
+
+		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+
+		assertThat(loanAlgorithm.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.3000")));
+	}
+
+	@Test
+	public void Given_MultipleLendersWithDifferentAmounts_Then_ReturnWeightedAverageRate() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(20, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(20, Config.CURRENCY));
+		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(20, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		amountToBorrowPerLender.put(lender1, Money.of(20, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender2, Money.of(10, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender3, Money.of(5, Config.CURRENCY));
+
+		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+
+		assertThat(loanAlgorithm.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.2143")));
+	}
+
+	@Test
 	public void Merges_Maps_With_Multiple_Lenders() {
 		Lender lender1 = mock(Lender.class);
 		Lender lender2 = mock(Lender.class);

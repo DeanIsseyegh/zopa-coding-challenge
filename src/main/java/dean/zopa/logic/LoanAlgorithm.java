@@ -4,6 +4,7 @@ import dean.zopa.Config;
 import dean.zopa.lender.Lender;
 import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
+import org.javamoney.moneta.function.MonetaryFunctions;
 
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
@@ -60,6 +61,21 @@ public class LoanAlgorithm {
 			lender.sub(amountToBorrow);
 		}
 		return leftOverAmount;
+	}
+
+	//Move logic into algorithm class
+	public BigDecimal calcLoanRate(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
+		List<BigDecimal> rates = new ArrayList<>();
+		MonetaryAmount total = amountsToBorrowPerLender.entrySet().stream().
+				map(it -> it.getValue()).
+				reduce(MonetaryFunctions.sum()).get();
+		for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
+			MonetaryAmount divided = mapEntry.getValue().divide(total.getNumber());
+			BigDecimal dividedAsBigDec = new BigDecimal(divided.getNumber().toString());
+			BigDecimal weightedRate = dividedAsBigDec.multiply(mapEntry.getKey().getRate());
+			rates.add(weightedRate);
+		}
+		return rates.stream().reduce(BigDecimal::add).get().setScale(4, BigDecimal.ROUND_HALF_EVEN);
 	}
 
 	Map<Lender, MonetaryAmount> mergeMaps(Map<Lender, MonetaryAmount> map1, Map<Lender, MonetaryAmount> map2) {

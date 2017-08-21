@@ -69,47 +69,14 @@ public class LoanCalculatorTest {
 	}
 
 	@Test
-	public void Given_OneLender_Then_ReturnLoanRate() {
-		Lender lender = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
-
+	public void Given_Lenders_Then_ReturnLoanRate() {
 		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
-		amountToBorrowPerLender.put(lender, Money.of(8, Config.CURRENCY));
 
-		LoanCalculator loanCalculator = new LoanCalculator(null);
+		LoanAlgorithm loanAlgorithm = mock(LoanAlgorithm.class);
+		LoanCalculator loanCalculator = new LoanCalculator(loanAlgorithm);
 
+		when(loanCalculator.calcLoanRate(amountToBorrowPerLender)).thenReturn(new BigDecimal("0.1000"));
 		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1000")));
-	}
-
-	@Test
-	public void Given_MultipleLenders_Then_ReturnAverageRate() {
-		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(10, Config.CURRENCY));
-		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(10, Config.CURRENCY));
-		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(10, Config.CURRENCY));
-
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
-		amountToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
-		amountToBorrowPerLender.put(lender2, Money.of(8, Config.CURRENCY));
-		amountToBorrowPerLender.put(lender3, Money.of(8, Config.CURRENCY));
-
-		LoanCalculator loanCalculator = new LoanCalculator(null);
-
-		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.3000")));
-	}
-
-	@Test
-	public void Given_MultipleLendersWithDifferentAmounts_Then_ReturnWeightedAverageRate() {
-		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(20, Config.CURRENCY));
-		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(20, Config.CURRENCY));
-		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(20, Config.CURRENCY));
-
-		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
-		amountToBorrowPerLender.put(lender1, Money.of(20, Config.CURRENCY));
-		amountToBorrowPerLender.put(lender2, Money.of(10, Config.CURRENCY));
-		amountToBorrowPerLender.put(lender3, Money.of(5, Config.CURRENCY));
-
-		LoanCalculator loanCalculator = new LoanCalculator(null);
-
-		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.2143")));
 	}
 
 	@Test

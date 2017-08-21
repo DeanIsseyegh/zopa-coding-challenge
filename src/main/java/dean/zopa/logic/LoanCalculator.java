@@ -38,17 +38,7 @@ public class LoanCalculator {
 
 	//Move logic into algorithm class
 	public BigDecimal calcLoanRate(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
-		List<BigDecimal> rates = new ArrayList<>();
-		MonetaryAmount total = amountsToBorrowPerLender.entrySet().stream().
-				map(it -> it.getValue()).
-				reduce(MonetaryFunctions.sum()).get();
-		for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
-			MonetaryAmount divided = mapEntry.getValue().divide(total.getNumber());
-			BigDecimal dividedAsBigDec = new BigDecimal(divided.getNumber().toString());
-			BigDecimal weightedRate = dividedAsBigDec.multiply(mapEntry.getKey().getRate());
-			rates.add(weightedRate);
-		}
-		return rates.stream().reduce(BigDecimal::add).get().setScale(4, BigDecimal.ROUND_HALF_EVEN);
+		return loanAlgorithm.calcLoanRate(amountsToBorrowPerLender);
 	}
 
 	/**
