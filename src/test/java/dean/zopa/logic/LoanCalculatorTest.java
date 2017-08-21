@@ -77,7 +77,7 @@ public class LoanCalculatorTest {
 
 		LoanCalculator loanCalculator = new LoanCalculator(null);
 
-		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.10")));
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1000")));
 	}
 
 	@Test
@@ -93,7 +93,23 @@ public class LoanCalculatorTest {
 
 		LoanCalculator loanCalculator = new LoanCalculator(null);
 
-		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.30")));
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.3000")));
+	}
+
+	@Test
+	public void Given_MultipleLendersWithDifferentAmounts_Then_ReturnWeightedAverageRate() {
+		Lender lender1 = new Lender("l1", new BigDecimal("0.1"), Money.of(20, Config.CURRENCY));
+		Lender lender2 = new Lender("l2", new BigDecimal("0.3"), Money.of(20, Config.CURRENCY));
+		Lender lender3 = new Lender("l3", new BigDecimal("0.5"), Money.of(20, Config.CURRENCY));
+
+		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
+		amountToBorrowPerLender.put(lender1, Money.of(20, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender2, Money.of(10, Config.CURRENCY));
+		amountToBorrowPerLender.put(lender3, Money.of(5, Config.CURRENCY));
+
+		LoanCalculator loanCalculator = new LoanCalculator(null);
+
+		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.2143")));
 	}
 
 	@Test

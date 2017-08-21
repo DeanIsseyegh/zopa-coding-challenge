@@ -3,11 +3,15 @@ package dean.zopa.logic;
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;
 import org.javamoney.moneta.Money;
+import org.javamoney.moneta.function.MonetaryFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LoanCalculator {
@@ -32,13 +36,19 @@ public class LoanCalculator {
 		return amountsToBorrowPerLender;
 	}
 
+	//Move logic into algorithm class
 	public BigDecimal calcLoanRate(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
-		ArrayList<BigDecimal> rates = new ArrayList<>();
+		List<BigDecimal> rates = new ArrayList<>();
+		MonetaryAmount total = amountsToBorrowPerLender.entrySet().stream().
+				map(it -> it.getValue()).
+				reduce(MonetaryFunctions.sum()).get();
 		for (Map.Entry<Lender, MonetaryAmount> mapEntry: amountsToBorrowPerLender.entrySet()) {
-			rates.add(mapEntry.getKey().getRate());
+			MonetaryAmount divided = mapEntry.getValue().divide(total.getNumber());
+			BigDecimal dividedAsBigDec = new BigDecimal(divided.getNumber().toString());
+			BigDecimal weightedRate = dividedAsBigDec.multiply(mapEntry.getKey().getRate());
+			rates.add(weightedRate);
 		}
-		BigDecimal summedRates = rates.stream().reduce(BigDecimal::add).get();
-		return summedRates.divide(new BigDecimal(rates.size()), 2, BigDecimal.ROUND_HALF_UP);
+		return rates.stream().reduce(BigDecimal::add).get().setScale(4, BigDecimal.ROUND_HALF_EVEN);
 	}
 
 	/**
