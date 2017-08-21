@@ -1,6 +1,7 @@
 package dean.zopa.logic;
 
 import dean.zopa.Config;
+import dean.zopa.Main;
 import dean.zopa.lender.Lender;
 import org.javamoney.moneta.Money;
 import org.javamoney.moneta.function.MonetaryFunctions;
@@ -18,8 +19,7 @@ public class LoanCalculator {
 
 	private LoanAlgorithm loanAlgorithm;
 	private Map<Lender, MonetaryAmount> amountsToBorrowPerLender = new HashMap<>();
-	public final static MonetaryAmount MIN_LEFTOVER_AMOUNT_THRESHOLD = Money.of(0.0001, Config.CURRENCY);
-	public final static BigDecimal NUM_OF_MONTHS = new BigDecimal("12");
+	public final static MonetaryAmount MIN_LEFTOVER_AMOUNT_THRESHOLD = Money.of(0.00001, Config.CURRENCY);
 
 	public LoanCalculator(LoanAlgorithm loanAlgorithm) {
 		this.loanAlgorithm  = loanAlgorithm;
@@ -32,7 +32,7 @@ public class LoanCalculator {
 		this.amountsToBorrowPerLender = loanAlgorithm.mergeMaps(this.amountsToBorrowPerLender, amountsToBorrowPerLender);
 		if (leftOverAmount.isGreaterThan(MIN_LEFTOVER_AMOUNT_THRESHOLD)) {
 			calcAmountToBorrowPerLender(leftOverAmount);
-		} //TODO Deal with rounding issues
+		}
 		return amountsToBorrowPerLender;
 	}
 

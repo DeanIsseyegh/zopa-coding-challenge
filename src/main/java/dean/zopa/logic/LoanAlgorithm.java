@@ -75,7 +75,7 @@ public class LoanAlgorithm {
 		return rates.stream().reduce(BigDecimal::add).get().setScale(4, BigDecimal.ROUND_HALF_EVEN);
 	}
 
-	private MonetaryAmount calcTotalAmountToBorrow(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
+	public MonetaryAmount calcTotalAmountToBorrow(Map<Lender, MonetaryAmount> amountsToBorrowPerLender) {
 		return amountsToBorrowPerLender.entrySet().stream().
 				map(it -> it.getValue()).
 				reduce(MonetaryFunctions.sum()).get();

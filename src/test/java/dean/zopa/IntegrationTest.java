@@ -3,7 +3,6 @@ package dean.zopa;
 import org.junit.Test;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +14,7 @@ import static org.hamcrest.core.Is.is;
 public class IntegrationTest {
 
 	@Test
-	public void Given_Lenders_AndValidRequestedAmount_ReturnCorrectQuote() throws IOException {
+	public void Given_Lenders_AndValidRequestedAmount_Then_ReturnCorrectQuote() throws IOException {
 		String content = "Lender,Rate,Available\n" +
 				"Bob,0.075,640\n" +
 				"Jane,0.069,480\n" +
@@ -31,17 +30,90 @@ public class IntegrationTest {
 	}
 
 	@Test
-	public void Given_DifferentSetOfLenders_AndValidRequestedAmount_ReturnCorrectQuote() throws IOException {
+	public void Given_DifferentSetOfLenders_AndValidRequestedAmount_Then_ReturnCorrectQuote() throws IOException {
 		String content = "Lender,Rate,Available\n" +
 				"Bob,0.075,640\n" +
 				"Jane,0.069,480\n" +
-				"Fred,0.071,520\n" +
+				"John,0.081,320\n" +
+				"Dave,0.074,140\n" +
+				"Rob,0.075,1440\n" +
+				"Tod,0.079,423\n" +
+				"Lou,0.041,1320\n" +
+				"Will,0.034,1120\n" +
+				"Marian,0.051,150\n";
+		writeContentToTestFile(content);
+		Quote quote = Main.run("testFile.csv", "4300");
+		String expectedQuote = "Requested amount: £4,300.00\nRate: 6.3%\nMonthly repayment: £131.48\nTotal repayment: £4,733.17";
+		assertThat(quote.toString(), is(expectedQuote));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_Lenders_RequestedAmountUnder1k_Then_ThrowException() throws IOException {
+		String content = "Lender,Rate,Available\n" +
+				"Bob,0.075,640\n" +
+				"Jane,0.069,480\n" +
 				"John,0.081,320\n" +
 				"Dave,0.074,140\n" +
 				"Angela,0.071,300\n";
 		writeContentToTestFile(content);
+		Quote quote = Main.run("testFile.csv", "900");
+		String expectedQuote = "Requested amount: £1,000.00\nRate: 7.4%\nMonthly repayment: £31.06\nTotal repayment: £1,118.18";
+		assertThat(quote.toString(), is(expectedQuote));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_Lenders_RequestedAmountOver15k_Then_ThrowException() throws IOException {
+		String content = "Lender,Rate,Available\n" +
+				"Bob,0.075,15000\n" +
+				"Jane,0.069,480\n" +
+				"John,0.081,320\n" +
+				"Dave,0.074,140\n" +
+				"Angela,0.071,300\n";
+		writeContentToTestFile(content);
+		Quote quote = Main.run("testFile.csv", "15100");
+		String expectedQuote = "Requested amount: £1,000.00\nRate: 7.4%\nMonthly repayment: £31.06\nTotal repayment: £1,118.18";
+		assertThat(quote.toString(), is(expectedQuote));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_Lenders_RequestedAmountNotIncrementOf100_Then_ThrowException() throws IOException {
+		String content = "Lender,Rate,Available\n" +
+				"Bob,0.075,640\n" +
+				"Jane,0.069,480\n" +
+				"John,0.081,320\n" +
+				"Dave,0.074,140\n" +
+				"Angela,0.071,300\n";
+		writeContentToTestFile(content);
+		Quote quote = Main.run("testFile.csv", "1001");
+		String expectedQuote = "Requested amount: £1,000.00\nRate: 7.4%\nMonthly repayment: £31.06\nTotal repayment: £1,118.18";
+		assertThat(quote.toString(), is(expectedQuote));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_Lenders_RequestedAmountMoreThanLendersHave_Then_ThrowException() throws IOException {
+		String content = "Lender,Rate,Available\n" +
+				"Bob,0.075,640\n" +
+				"Jane,0.069,480\n" +
+				"John,0.081,320\n" +
+				"Dave,0.074,140\n" +
+				"Angela,0.071,300\n";
+		writeContentToTestFile(content);
+		Quote quote = Main.run("testFile.csv", "10000");
+		String expectedQuote = "Requested amount: £1,000.00\nRate: 7.4%\nMonthly repayment: £31.06\nTotal repayment: £1,118.18";
+		assertThat(quote.toString(), is(expectedQuote));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void Given_Lenders_WithNonUniqueNames_Then_ThrowException() throws IOException {
+		String content = "Lender,Rate,Available\n" +
+				"Bob,0.075,640\n" +
+				"Jane,0.069,480\n" +
+				"Bob,0.081,320\n" +
+				"Dave,0.074,140\n" +
+				"Angela,0.071,300\n";
+		writeContentToTestFile(content);
 		Quote quote = Main.run("testFile.csv", "1000");
-		String expectedQuote = "Requested amount: £1,000.00\nRate: 7.4%\nMonthly repayment: £31.04\nTotal repayment: £1,117.35";
+		String expectedQuote = "Requested amount: £1,000.00\nRate: 7.4%\nMonthly repayment: £31.06\nTotal repayment: £1,118.18";
 		assertThat(quote.toString(), is(expectedQuote));
 	}
 
