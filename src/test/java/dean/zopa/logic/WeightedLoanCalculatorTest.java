@@ -12,17 +12,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static dean.zopa.logic.LoanCalculator.MIN_LEFTOVER_AMOUNT_THRESHOLD;
+import static dean.zopa.logic.WeightedLoanCalculator.MIN_LEFTOVER_AMOUNT_THRESHOLD;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class LoanCalculatorTest {
+public class WeightedLoanCalculatorTest {
 
 	@Test
 	public void Returns_AmountToBorrowPerLender() {
-		LoanAlgorithm loanAlgorithm = mock(LoanAlgorithm.class);
-		LoanCalculator loanCalculator = new LoanCalculator(loanAlgorithm);
+		WeightedLoanAlgorithm loanAlgorithm = mock(WeightedLoanAlgorithm.class);
+		WeightedLoanCalculator loanCalculator = new WeightedLoanCalculator(loanAlgorithm);
 		MonetaryAmount amountToBorrow = Money.of(10, Config.CURRENCY);
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
@@ -44,8 +44,8 @@ public class LoanCalculatorTest {
 
 	@Test
 	public void Keeps_Using_LoanAlgorithm_Until_LeftOverAmount_Is_PastThreshold() {
-		LoanAlgorithm loanAlgorithm = mock(LoanAlgorithm.class);
-		LoanCalculator loanCalculator = new LoanCalculator(loanAlgorithm);
+		WeightedLoanAlgorithm loanAlgorithm = mock(WeightedLoanAlgorithm.class);
+		WeightedLoanCalculator loanCalculator = new WeightedLoanCalculator(loanAlgorithm);
 		MonetaryAmount amountToBorrow = Money.of(10, Config.CURRENCY);
 
 		Map<Lender, BigDecimal> lenderRatios = new HashMap<>();
@@ -72,8 +72,8 @@ public class LoanCalculatorTest {
 	public void Given_Lenders_Then_ReturnLoanRate() {
 		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
 
-		LoanAlgorithm loanAlgorithm = mock(LoanAlgorithm.class);
-		LoanCalculator loanCalculator = new LoanCalculator(loanAlgorithm);
+		WeightedLoanAlgorithm loanAlgorithm = mock(WeightedLoanAlgorithm.class);
+		WeightedLoanCalculator loanCalculator = new WeightedLoanCalculator(loanAlgorithm);
 
 		when(loanCalculator.calcLoanRate(amountToBorrowPerLender)).thenReturn(new BigDecimal("0.1000"));
 		assertThat(loanCalculator.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1000")));
@@ -81,8 +81,8 @@ public class LoanCalculatorTest {
 
 	@Test
 	public void Given_AmountAndRateAndPaymentPeriods_Then_ReturnMonthlyPayment() {
-		LoanAlgorithm loanAlgorithm = mock(LoanAlgorithm.class);
-		LoanCalculator loanCalculator = new LoanCalculator(loanAlgorithm);
+		WeightedLoanAlgorithm loanAlgorithm = mock(WeightedLoanAlgorithm.class);
+		WeightedLoanCalculator loanCalculator = new WeightedLoanCalculator(loanAlgorithm);
 
 		MonetaryAmount principalAmount = Money.of(1, Config.CURRENCY);
 		BigDecimal rate = BigDecimal.ONE;
@@ -97,7 +97,7 @@ public class LoanCalculatorTest {
 	@Test
 	public void Given_MonthlyRepaymentAmount_Then_ReturnTotalRepayment() {
 		MonetaryAmount monthlyAmount = Money.of(10, Config.CURRENCY);
-		LoanCalculator loanCalculator = new LoanCalculator(null);
+		WeightedLoanCalculator loanCalculator = new WeightedLoanCalculator(null);
 		assertThat(loanCalculator.calcTotalRepayment(monthlyAmount), is(Money.of(360, Config.CURRENCY)));
 	}
 }

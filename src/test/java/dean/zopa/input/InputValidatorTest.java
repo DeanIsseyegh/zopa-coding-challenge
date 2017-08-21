@@ -1,4 +1,4 @@
-package dean.zopa.csv;
+package dean.zopa.input;
 
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;

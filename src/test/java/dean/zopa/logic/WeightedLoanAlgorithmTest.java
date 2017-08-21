@@ -15,7 +15,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class LoanAlgorithmTest {
+public class WeightedLoanAlgorithmTest {
 
 	private MonetaryAmount onePound = Money.of(1, Config.CURRENCY);
 
@@ -24,7 +24,7 @@ public class LoanAlgorithmTest {
 		Lender lender = new Lender("l1", new BigDecimal("0.1"), onePound);
 		LenderPool lenderPool = new LenderPool(Collections.singletonList(lender));
 		Map<Lender, BigDecimal> expectedRatios = Collections.singletonMap(lender, new BigDecimal("1.000000"));
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 
 		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
@@ -39,7 +39,7 @@ public class LoanAlgorithmTest {
 		expectedRatios.put(lender1, new BigDecimal("0.500000"));
 		expectedRatios.put(lender2, new BigDecimal("0.500000"));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(new LenderPool(lenders));
 
 		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
@@ -54,7 +54,7 @@ public class LoanAlgorithmTest {
 		expectedRatios.put(lender1, new BigDecimal("0.571429"));
 		expectedRatios.put(lender2, new BigDecimal("0.428571"));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(new LenderPool(lenders));
 
 		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
@@ -73,7 +73,7 @@ public class LoanAlgorithmTest {
 		expectedRatios.put(lender3, new BigDecimal("0.275668"));
 		expectedRatios.put(lender4, new BigDecimal("0.260197"));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(new LenderPool(lenders));
 
 		assertThat(algorithm.calcLenderRatios(), is(expectedRatios));
 	}
@@ -88,7 +88,7 @@ public class LoanAlgorithmTest {
 		Map<Lender, BigDecimal> lenderRatios = Collections.singletonMap(lender, new BigDecimal("1.000"));
 		Map<Lender, MonetaryAmount> expectedResult = Collections.singletonMap(lender, borrowerAmount);
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(new LenderPool(lenders));
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(new LenderPool(lenders));
 
 		assertThat(algorithm.calcAmountsToBorrowPerLender(borrowerAmount, lenderRatios), is(expectedResult));
 	}
@@ -109,7 +109,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender1, Money.of(5, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(5, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 
 		assertThat(algorithm.calcAmountsToBorrowPerLender(borrowerAmount, lenderRatios), is(expectedResult));
 	}
@@ -130,7 +130,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender1, Money.of(6.67, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(3.33, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 
 		assertThat(algorithm.calcAmountsToBorrowPerLender(borrowerAmount, lenderRatios), is(expectedResult));
 	}
@@ -157,7 +157,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender3, Money.of(3.00, Config.CURRENCY));
 		expectedResult.put(lender4, Money.of(1.00, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 
 		assertThat(algorithm.calcAmountsToBorrowPerLender(borrowerAmount, lenderRatios), is(expectedResult));
 	}
@@ -176,7 +176,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender1, Money.of(2.00, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(4.00, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
@@ -194,7 +194,7 @@ public class LoanAlgorithmTest {
 		Map<Lender, MonetaryAmount> expectedResult = new TreeMap<>();
 		expectedResult.put(lender, Money.of(10, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
@@ -215,7 +215,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender1, Money.of(10, Config.CURRENCY));
 		expectedResult.put(lender2, Money.of(10, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(amountsToBorrowPerLender, is(expectedResult));
@@ -242,7 +242,7 @@ public class LoanAlgorithmTest {
 		expectedResult.put(lender3, Money.of(12, Config.CURRENCY));
 		expectedResult.put(lender4, Money.of(20, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 		MonetaryAmount leftOverMoney = algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		assertThat(leftOverMoney, is(Money.of(5, Config.CURRENCY)));
@@ -263,7 +263,7 @@ public class LoanAlgorithmTest {
 		amountsToBorrowPerLender.put(lender1, Money.of(8, Config.CURRENCY));
 		amountsToBorrowPerLender.put(lender2, Money.of(12, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(lenderPool);
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(lenderPool);
 		algorithm.updateLenderAmountsAndReturnLeftOverAmount(amountsToBorrowPerLender);
 
 		verify(lender1, times(1)).sub(Money.of(8, Config.CURRENCY));
@@ -276,7 +276,7 @@ public class LoanAlgorithmTest {
 		Map<Lender, MonetaryAmount> map1 = Collections.singletonMap(lender, Money.of(1, Config.CURRENCY));
 		Map<Lender, MonetaryAmount> map2 = Collections.singletonMap(lender, Money.of(2, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(mock(LenderPool.class));
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(mock(LenderPool.class));
 
 		Map<Lender, MonetaryAmount> expectedMergedMap = Collections.singletonMap(lender, Money.of(3, Config.CURRENCY));
 
@@ -290,7 +290,7 @@ public class LoanAlgorithmTest {
 		Map<Lender, MonetaryAmount> amountToBorrowPerLender = new TreeMap<>();
 		amountToBorrowPerLender.put(lender, Money.of(8, Config.CURRENCY));
 
-		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+		WeightedLoanAlgorithm loanAlgorithm = new WeightedLoanAlgorithm(null);
 
 		assertThat(loanAlgorithm.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.1000")));
 	}
@@ -306,7 +306,7 @@ public class LoanAlgorithmTest {
 		amountToBorrowPerLender.put(lender2, Money.of(8, Config.CURRENCY));
 		amountToBorrowPerLender.put(lender3, Money.of(8, Config.CURRENCY));
 
-		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+		WeightedLoanAlgorithm loanAlgorithm = new WeightedLoanAlgorithm(null);
 
 		assertThat(loanAlgorithm.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.3000")));
 	}
@@ -322,14 +322,14 @@ public class LoanAlgorithmTest {
 		amountToBorrowPerLender.put(lender2, Money.of(10, Config.CURRENCY));
 		amountToBorrowPerLender.put(lender3, Money.of(5, Config.CURRENCY));
 
-		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+		WeightedLoanAlgorithm loanAlgorithm = new WeightedLoanAlgorithm(null);
 
 		assertThat(loanAlgorithm.calcLoanRate(amountToBorrowPerLender), is(new BigDecimal("0.2143")));
 	}
 
 	@Test
 	public void Given_AmountAndRateAndPaymentPeriods_Then_ReturnMonthlyPayment() {
-		LoanAlgorithm loanAlgorithm = new LoanAlgorithm(null);
+		WeightedLoanAlgorithm loanAlgorithm = new WeightedLoanAlgorithm(null);
 		MonetaryAmount principalAmount = Money.of(1000, Config.CURRENCY);
 		BigDecimal rate = new BigDecimal("0.07");
 		MonetaryAmount monthlyRepayment = loanAlgorithm.calcMonthlyRepayment(principalAmount, rate, 36);
@@ -350,7 +350,7 @@ public class LoanAlgorithmTest {
 		map2.put(lender1, Money.of(20, Config.CURRENCY));
 		map2.put(lender2, Money.of(30, Config.CURRENCY));
 
-		LoanAlgorithm algorithm = new LoanAlgorithm(mock(LenderPool.class));
+		WeightedLoanAlgorithm algorithm = new WeightedLoanAlgorithm(mock(LenderPool.class));
 
 		Map<Lender, MonetaryAmount> expectedMergedMap = new HashMap<>();
 		expectedMergedMap.put(lender1, Money.of(25, Config.CURRENCY));

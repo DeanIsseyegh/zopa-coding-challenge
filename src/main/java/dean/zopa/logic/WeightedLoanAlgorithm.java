@@ -18,13 +18,13 @@ import java.util.stream.Stream;
  *
  * Alternative algorithm could be to not allow any lender to give more than 50% of their money to one borrower.
  */
-public class LoanAlgorithm {
+public class WeightedLoanAlgorithm {
 
 	private LenderPool lenderPool;
 	private int divisorScale = 6;
 	public final BigDecimal numOfMonths = new BigDecimal("12");
 
-	public LoanAlgorithm(LenderPool lenderPool) {
+	public WeightedLoanAlgorithm(LenderPool lenderPool) {
 		this.lenderPool = lenderPool;
 	}
 

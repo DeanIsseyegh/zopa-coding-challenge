@@ -1,7 +1,5 @@
 package dean.zopa;
 
-import javax.money.CurrencyUnit;
-import javax.money.Monetary;
 import java.util.Locale;
 
 public class Config {

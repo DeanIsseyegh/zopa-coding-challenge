@@ -1,18 +1,16 @@
 package dean.zopa;
 
-import dean.zopa.csv.InputParser;
-import dean.zopa.csv.InputValidator;
+import dean.zopa.input.CustomInputParser;
+import dean.zopa.input.InputParser;
+import dean.zopa.input.InputValidator;
 import dean.zopa.lender.Lender;
 import dean.zopa.lender.LenderPool;
-import dean.zopa.logic.LoanAlgorithm;
 import dean.zopa.logic.LoanCalculator;
-import org.javamoney.moneta.Money;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dean.zopa.logic.WeightedLoanAlgorithm;
+import dean.zopa.logic.WeightedLoanCalculator;
 
 import javax.money.MonetaryAmount;
 import java.io.*;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -21,23 +19,19 @@ import java.util.stream.Stream;
 
 public class Main {
 
-	//gradle run -PappArgs="['marketTest.csv', '1000']"
+	//gradle run -PappArgs="['marketTest.input', '1000']"
 	public static void main(String... args) throws IOException {
 		System.out.println(run(args[0], args[1]));
 	}
 
-	public static Quote run(String arg0, String arg1) throws IOException {
-		String filePath = arg0;
+	public static Quote run(String filePath, String amount) throws IOException {
 		Stream<String> stream = Files.lines(Paths.get(filePath));
 		List<String> fileLines = stream.collect(Collectors.toList());
-
-		InputParser inputParser = new InputParser(new InputValidator());
+		InputParser inputParser = new CustomInputParser(new InputValidator());
 		List<Lender> lenders = inputParser.parseLenders(fileLines);
 		LenderPool lenderPool = new LenderPool(lenders);
-		MonetaryAmount amountRequested = inputParser.parseAmount(arg1, lenderPool);
-
-		LoanCalculator loanCalculator = new LoanCalculator(new LoanAlgorithm(lenderPool));
-
+		MonetaryAmount amountRequested = inputParser.parseAmount(amount, lenderPool);
+		LoanCalculator loanCalculator = new WeightedLoanCalculator(new WeightedLoanAlgorithm(lenderPool));
 		return new Quote(amountRequested, loanCalculator);
 	}
 

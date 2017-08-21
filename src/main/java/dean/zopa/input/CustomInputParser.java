@@ -1,4 +1,4 @@
-package dean.zopa.csv;
+package dean.zopa.input;
 
 import dean.zopa.Config;
 import dean.zopa.lender.Lender;
@@ -6,20 +6,19 @@ import dean.zopa.lender.LenderPool;
 import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
-import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputParser {
+public class CustomInputParser implements InputParser {
 
 	private InputValidator inputValidator;
 
-	public InputParser(InputValidator inputValidator) {
+	public CustomInputParser(InputValidator inputValidator) {
 		this.inputValidator = inputValidator;
 	}
 
-	public List<Lender> parseLenders(List<String> content) throws IOException {
+	public List<Lender> parseLenders(List<String> content) {
 		List<Lender> lenders = new ArrayList<>();
 		content = removeFirstLine(content);
 		for (String string : content) {
